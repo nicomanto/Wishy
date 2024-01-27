@@ -33,6 +33,7 @@
             margin-bottom: 15px;
             border-bottom: 2px solid #2ecc71;
             padding-bottom: 10px;
+            text-align: center;
         }
 
         ul {
@@ -40,41 +41,45 @@
             padding: 0;
         }
 
-        li {
+        .card {
             background-color: #ecf0f1;
             border: 1px solid #bdc3c7;
             margin: 15px 0;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
         }
 
-        strong {
+        .card strong {
             color: #e74c3c;
         }
 
-        a {
+        .card a {
             color: #3498db;
             text-decoration: none;
             font-weight: bold;
         }
 
-        a:hover {
+        .card a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-    <h1>Wish List</h1>
+    <h1>Niccolò Wish List</h1>
     {{range .}}
     <div class="category">
         <h2>{{.Cat}}</h2>
         <ul>
             {{range .Wishes}}
-            <li>
+            <li class="card">
                 <strong>Name:</strong> {{.Name}}<br>
-                <strong>Link:</strong> <a href="{{.Link}}" target="_blank">{{.Link}}</a><br>
+                <strong>Link:</strong> <a href="{{.Link}}" target="_blank">{{.Link}}</a>
             </li>
             {{end}}
         </ul>

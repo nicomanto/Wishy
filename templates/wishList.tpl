@@ -76,9 +76,9 @@
 <body>
     <h1>Niccolò Wish List</h1>
 
-    {{range .Cat}}
+    {{range .}}
     <div class="category">
-        <h2>{{.Name}}</h2>
+        <h2>{{.Cat}}</h2>
         <ul class="card">
             {{range .Wishes}}
             <li class="wish-item">

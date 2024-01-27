@@ -7,12 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       # Setup Go
       - name: Setup Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: '1.26.6'
+          go-version: '1.26'
       # Cache go
       - name: Cache Go build and mod
         uses: actions/cache@v3
@@ -42,7 +42,7 @@ jobs:
     #if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       # Restore build from build-tests job
       - name: Restore build
         uses: actions/cache@v3

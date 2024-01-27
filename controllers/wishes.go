@@ -3,11 +3,11 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strings"
 	"wishy/common"
 	"wishy/models"
+	"wishy/templates"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/sirupsen/logrus"
@@ -27,34 +27,9 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
 
-	// Create an HTML template
-	tmpl, err := template.New("index").Parse(`
-		<!DOCTYPE html>
-		<html>
-		<head>
-			<title>Item List</title>
-		</head>
-		<body>
-			<h1>Item List</h1>
-			<ul>
-				{{range .}}
-					<li>
-						<strong>Name:</strong> {{.Name}}<br>
-						<strong>Link:</strong> <a href="{{.Link}}" target="_blank">{{.Link}}</a><br>
-						<strong>Category:</strong> {{.Category.Name}}<br>
-					</li>
-				{{end}}
-			</ul>
-		</body>
-		</html>
-	`)
-	if err != nil {
-		logrus.Errorln(err)
-		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
-	}
-
+	// load html page
 	var responseBody strings.Builder
-	err = tmpl.Execute(&responseBody, wishes)
+	err = templates.HtmlTpls[templates.WishListHtmlTemplateType].Execute(&responseBody, wishes)
 	if err != nil {
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)

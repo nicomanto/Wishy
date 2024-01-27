@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"wishy/controllers"
 	"wishy/mongodb"
+	"wishy/templates"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,6 +17,9 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	// Connect to MongoDB
 	client := mongodb.Connect(os.Getenv("MONGODB_URI"))
 	db := client.Database(os.Getenv("DB_NAME"))
+
+	// pre load html page
+	templates.InitHtmlTpls()
 
 	endpoint := request.Path
 	// Execute different logic based on the endpoint

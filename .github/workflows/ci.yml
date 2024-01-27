@@ -16,9 +16,6 @@ jobs:
       # Run testing on the code
       - name: Test
         run: go test ./... -v
-      # Run build
-      - name: Build
-        run: GOARCH=amd64 GOOS=linux go build -o main main.go
       # Cache build for deploy-lambda job
   deploy-lambda:
     name: deploy lambda function
@@ -28,6 +25,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+       # Run build
+      - name: Build
+        run: go build
       - name: Install Serverless Framework
         run: npm install -g serverless
       # Zip build for lambda push

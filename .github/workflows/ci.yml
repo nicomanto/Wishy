@@ -3,7 +3,7 @@ on: push
 
 jobs:
   build-tests:
-    name: build and tests
+    name: tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -16,11 +16,10 @@ jobs:
       # Run testing on the code
       - name: Test
         run: go test ./... -v
-      # Cache build for deploy-lambda job
   deploy-lambda:
     name: deploy lambda function
     runs-on: ubuntu-latest
-    needs: build-tests
+    needs: tests
     #if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repo

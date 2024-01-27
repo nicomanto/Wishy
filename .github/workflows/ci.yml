@@ -25,9 +25,14 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+       # Setup Go
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
        # Run build
       - name: Build
-        run: go build
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main main.go
       - name: Install Serverless Framework
         run: npm install -g serverless
       # Zip build for lambda push

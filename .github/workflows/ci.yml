@@ -13,12 +13,12 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-      # Run build
-      - name: Build
-        run: go build 
       # Run testing on the code
       - name: Test
         run: go test ./... -v
+      # Run build
+      - name: Build
+        run: go build 
       # Cache build for deploy-lambda job
   deploy-lambda:
     name: deploy lambda function

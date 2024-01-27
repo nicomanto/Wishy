@@ -34,8 +34,8 @@ jobs:
         run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main main.go
       - name: Install Serverless Framework
         run: npm install -g serverless
-      - name: Install Serveless plugins
-        run: serverless plugin install -n serverless-go-plugin
+      #- name: Install Serveless plugins
+      #  run: serverless plugin install -n serverless-go-plugin
       # Zip build for lambda push
       - name: Deploy to AWS Lambda
         run: serverless deploy

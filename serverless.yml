@@ -1,5 +1,4 @@
-service:
-  name: my-golang-lambda
+service: my-golang-lambda
 
 provider:
   name: aws

@@ -2,6 +2,10 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"html/template"
+	"net/http"
+	"strings"
 	"wishy/common"
 	"wishy/models"
 
@@ -16,11 +20,40 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 	cur, err := db.Collection(models.Wish{}.DBCollectionName()).Find(ctx, bson.M{})
 	if err != nil {
 		logrus.Errorln(err)
-		return nil, err
+		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
 	if err := cur.All(ctx, &wishes); err != nil {
 		logrus.Errorln(err)
-		return nil, err
+		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
-	return common.JSONResponse(wishes)
+
+	// Create an HTML template
+	tmpl, err := template.New("index").Parse(`
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>Item List</title>
+		</head>
+		<body>
+			<h1>Item List</h1>
+			<ul>
+				{{range .}}
+					<li>
+						<strong>ID:</strong> {{.ID}}<br>
+						<strong>Name:</strong> {{.Name}}<br>
+						<strong>Link:</strong> <a href="{{.Link}}" target="_blank">{{.Link}}</a><br>
+						<strong>Category:</strong> {{.Cat}}<br>
+					</li>
+				{{end}}
+			</ul>
+		</body>
+		</html>
+	`)
+
+	var responseBody strings.Builder
+	err = tmpl.Execute(&responseBody, wishes)
+	if err != nil {
+		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
+	}
+	return common.HTMLResponse(responseBody.String())
 }

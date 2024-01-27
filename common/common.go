@@ -17,3 +17,11 @@ func JSONResponse(m interface{}) (*events.APIGatewayProxyResponse, error) {
 		Body:       string(j),
 	}, nil
 }
+
+func HTMLResponse(body string) (*events.APIGatewayProxyResponse, error) {
+	return &events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers:    map[string]string{"Content-Type": "text/html"},
+		Body:       body,
+	}, nil
+}

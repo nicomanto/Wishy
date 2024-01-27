@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"wishy/common"
 	"wishy/models"
 
@@ -16,11 +18,11 @@ func GetCategeories(ctx context.Context, request events.APIGatewayProxyRequest, 
 	cur, err := db.Collection(models.Category{}.DBCollectionName()).Find(ctx, bson.M{})
 	if err != nil {
 		logrus.Errorln(err)
-		return nil, err
+		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
 	if err := cur.All(ctx, &categories); err != nil {
 		logrus.Errorln(err)
-		return nil, err
+		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
 	return common.JSONResponse(categories)
 }

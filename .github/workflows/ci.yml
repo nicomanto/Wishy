@@ -18,7 +18,7 @@ jobs:
         run: go test ./... -v
       # Run build
       - name: Build
-        run: go build 
+        run: GOARCH=amd64 GOOS=linux go build -o main main.go
       # Cache build for deploy-lambda job
   deploy-lambda:
     name: deploy lambda function

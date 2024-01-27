@@ -8,7 +8,7 @@ type Wish struct {
 	ID       primitive.ObjectID `json:"id" bson:"_id"`
 	Name     string             `json:"name" bson:"name"`
 	Link     string             `json:"link" bson:"link"`
-	Category primitive.ObjectID `json:"cat" bson:"cat"`
+	Category Category           `json:"cat" bson:"cat"`
 }
 
 func (c Wish) DBCollectionName() string {

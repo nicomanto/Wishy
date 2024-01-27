@@ -39,10 +39,9 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 			<ul>
 				{{range .}}
 					<li>
-						<strong>ID:</strong> {{.ID}}<br>
 						<strong>Name:</strong> {{.Name}}<br>
 						<strong>Link:</strong> <a href="{{.Link}}" target="_blank">{{.Link}}</a><br>
-						<strong>Category:</strong> {{.Cat}}<br>
+						<strong>Category:</strong> {{.Category.Name}}<br>
 					</li>
 				{{end}}
 			</ul>

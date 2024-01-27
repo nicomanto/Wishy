@@ -13,15 +13,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-      # Cache go
-      - name: Cache Go build and mod
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: ${{ runner.os }}-go-
       # Run build
       - name: Build
         run: go build 
@@ -29,12 +20,6 @@ jobs:
       - name: Test
         run: go test ./... -v
       # Cache build for deploy-lambda job
-      - name: Cache build
-        #if: github.ref == 'refs/heads/main'
-        uses: actions/cache@v3
-        with:
-          path: Wishy
-          key: ${{ runner.os }}-Wishy-${{ github.sha }}
   deploy-lambda:
     name: deploy lambda function
     runs-on: ubuntu-latest
@@ -43,12 +28,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      # Restore build from build-tests job
-      - name: Restore build
-        uses: actions/cache@v3
-        with:
-          path: Wishy
-          key: ${{ runner.os }}-Wishy-${{ github.sha }}
       - name: Install Serverless Framework
         run: npm install -g serverless
       # Zip build for lambda push

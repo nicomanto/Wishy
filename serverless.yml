@@ -6,9 +6,13 @@ provider:
   region: eu-west-1
 
 functions:
-  myFunction:
+  lambda:
     handler: main
     events:
       - http:
-          path: /
-          method: any
+          path: /categories
+          method: ANY
+      - http:
+          path: /wishes
+          method: ANY
+

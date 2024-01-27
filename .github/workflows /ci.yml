@@ -1,0 +1,59 @@
+name: Build-test-deployAWSLambda
+on: push
+
+jobs:
+  build-tests:
+    name: build and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      # Setup Go
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.26.6'
+      # Cache go
+      - name: Cache Go build and mod
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+      # Run build
+      - name: Build
+        run: go build 
+      # Run testing on the code
+      - name: Test
+        run: go test ./... -v
+      # Cache build for deploy-lambda job
+      - name: Cache build
+        #if: github.ref == 'refs/heads/main'
+        uses: actions/cache@v3
+        with:
+          path: Wishy
+          key: ${{ runner.os }}-Wishy-${{ github.sha }}
+  deploy-lambda:
+    name: deploy lambda function
+    runs-on: ubuntu-latest
+    needs: build-tests
+    #if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      # Restore build from build-tests job
+      - name: Restore build
+        uses: actions/cache@v3
+        with:
+          path: Wishy
+          key: ${{ runner.os }}-Wishy-${{ github.sha }}
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+      # Zip build for lambda push
+      - name: Deploy to AWS Lambda
+        run: serverless deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

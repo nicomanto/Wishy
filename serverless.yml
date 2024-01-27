@@ -1,0 +1,15 @@
+service:
+  name: my-golang-lambda
+
+provider:
+  name: aws
+  runtime: go1.x
+  region: eu-west-1
+
+functions:
+  myFunction:
+    handler: main
+    events:
+      - http:
+          path: /
+          method: any

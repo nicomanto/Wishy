@@ -49,10 +49,15 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 		</body>
 		</html>
 	`)
+	if err != nil {
+		logrus.Errorln(err)
+		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
+	}
 
 	var responseBody strings.Builder
 	err = tmpl.Execute(&responseBody, wishes)
 	if err != nil {
+		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
 	return common.HTMLResponse(responseBody.String())

@@ -16,8 +16,21 @@ import (
 )
 
 func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) (*events.APIGatewayProxyResponse, error) {
-	wishes := []models.Wish{}
-	cur, err := db.Collection(models.Wish{}.DBCollectionName()).Find(ctx, bson.M{})
+	wishes := []struct {
+		Cat    string `json:"cat" bson:"_id"`
+		Wishes []struct {
+			Name string `json:"name" bson:"name"`
+			Link string `json:"link" bson:"link"`
+		} `json:"wishes" bson:"wishes"`
+	}{}
+	cur, err := db.Collection(models.Wish{}.DBCollectionName()).Aggregate(ctx, []bson.M{
+		{"$group": bson.M{
+			"_id": "$cat.name",
+			"wishes": bson.M{
+				"$push": bson.M{"name": "$name", "link": "$link"},
+			},
+		}},
+	})
 	if err != nil {
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)

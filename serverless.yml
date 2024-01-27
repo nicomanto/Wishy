@@ -1,4 +1,4 @@
-service: my-golang-lambda
+service: wishy
 
 provider:
   name: aws

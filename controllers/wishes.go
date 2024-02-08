@@ -30,7 +30,7 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 				"$push": bson.M{"name": "$name", "link": "$link"},
 			},
 		}},
-		{"$sort": bson.M{"_id": -1}},
+		{"$sort": bson.M{"_id": 1}},
 	})
 	if err != nil {
 		logrus.Errorln(err)

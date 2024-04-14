@@ -41,33 +41,17 @@
             padding: 0;
         }
 
-        .card {
-            background-color: #ffffff; /* Change the background color to a cheerful yellow */
-            border: 1px solid #bdc3c7;
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
         .wish-item {
-            width: 48%;
             margin-bottom: 10px;
         }
 
-        .card a {
+        .wish-item a {
             color: #3498db;
             text-decoration: none;
             font-weight: bold;
-            text-align: center;
-            display: block;
-            margin: 0 auto;
         }
 
-        .card a:hover {
+        .wish-item a:hover {
             text-decoration: underline;
         }
     </style>
@@ -76,15 +60,13 @@
 <body>
     <h1>Niccolò Wish List</h1>
 
-    {{range .}}
+    {{range .Categories}}
     <div class="category">
-        <h2>{{.Cat}}</h2>
-        <ul class="card">
+        <h2>{{.Name}}</h2>
+        <ul>
             {{range .Wishes}}
             <li class="wish-item">
-                <div class="card">
-                    <a href="{{.Link}}" target="_blank">{{.Name}}</a>
-                </div>
+                <a href="{{.Link}}" target="_blank">{{.Name}}</a>
             </li>
             {{end}}
         </ul>

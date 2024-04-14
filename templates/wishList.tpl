@@ -54,6 +54,15 @@
         .wish-item a:hover {
             text-decoration: underline;
         }
+
+        .wish-item::before {
+            content: "\2022"; /* bullet point character */
+            color: #111111; /* color of the bullet point (red in this example) */
+            font-weight: bold; /* make the bullet point bold */
+            display: inline-block;
+            width: 1em; /* adjust spacing between bullet point and wish name */
+            margin-left: 0.5em; /* align bullet point with previous headline */
+        }
     </style>
 </head>
 

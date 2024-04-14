@@ -4,18 +4,13 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"wishy/models"
 	"wishy/templates"
 
 	"github.com/stretchr/testify/require"
 )
 
-var mockWishesList []struct {
-	Cat    string `json:"cat" bson:"_id"`
-	Wishes []struct {
-		Name string `json:"name" bson:"name"`
-		Link string `json:"link" bson:"link"`
-	} `json:"wishes" bson:"wishes"`
-}
+var mockWishesList []models.WishByCategory
 
 func TestMain(m *testing.M) {
 	setup()
@@ -27,13 +22,7 @@ func TestMain(m *testing.M) {
 func setup() {
 	// pre load html page
 	templates.InitHtmlTpls()
-	mockWishesList = []struct {
-		Cat    string "json:\"cat\" bson:\"_id\""
-		Wishes []struct {
-			Name string "json:\"name\" bson:\"name\""
-			Link string "json:\"link\" bson:\"link\""
-		} "json:\"wishes\" bson:\"wishes\""
-	}{
+	mockWishesList = []models.WishByCategory{
 		{
 			Cat: "cat-1",
 			Wishes: []struct {

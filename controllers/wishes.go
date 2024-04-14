@@ -16,13 +16,7 @@ import (
 )
 
 func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) (*events.APIGatewayProxyResponse, error) {
-	wishes := []struct {
-		Cat    string `json:"cat" bson:"_id"`
-		Wishes []struct {
-			Name string `json:"name" bson:"name"`
-			Link string `json:"link" bson:"link"`
-		} `json:"wishes" bson:"wishes"`
-	}{}
+	wishes := []models.WishByCategory{}
 	cur, err := db.Collection(models.Wish{}.DBCollectionName()).Aggregate(ctx, []bson.M{
 		{"$group": bson.M{
 			"_id": "$cat.name",

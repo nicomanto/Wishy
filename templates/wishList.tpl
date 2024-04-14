@@ -60,7 +60,7 @@
 <body>
     <h1>Niccolò Wish List</h1>
 
-    {{range .Categories}}
+    {{range .Cat}}
     <div class="category">
         <h2>{{.Name}}</h2>
         <ul>

@@ -5,10 +5,13 @@ provider:
   runtime: provided.al2023
   region: ${env:AWS_REGION, 'eu-west-1'}
   stage: ${env:STAGE, 'dev'}
+   
 
 functions:
   lambda:
-    handler: main
+    handler: bootstrap
+    package:
+      artifact: bootstrap.zip
     events:
       #- http:
       #   path: /categories

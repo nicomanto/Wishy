@@ -31,7 +31,9 @@ jobs:
           go-version: '1.21'
        # Run build
       - name: Build
-        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main main.go
+        run: |
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap main.go
+          zip bootstrap.zip bootstrap
       - name: Install Serverless Framework
         run: npm install -g serverless
       # Zip build for lambda push

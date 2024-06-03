@@ -3,16 +3,17 @@ service: wishy
 provider:
   name: aws
   runtime: go1.x
-  region: eu-west-1
+  region: ${env:AWS_REGION, 'eu-west-1'}
+  stage: ${env:STAGE, 'dev'}
 
 functions:
   lambda:
     handler: main
     events:
-      - http:
-          path: /categories
-          method: ANY
+      #- http:
+      #   path: /categories
+      #    method: ANY
       - http:
           path: /wishes
-          method: ANY
+          method: GET
 

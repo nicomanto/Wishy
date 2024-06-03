@@ -36,7 +36,7 @@ jobs:
         run: npm install -g serverless
       # Zip build for lambda push
       - name: Deploy to AWS Lambda
-        run: serverless deploy
+        run: serverless deploy --stage prod
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

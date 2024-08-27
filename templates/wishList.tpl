@@ -15,7 +15,7 @@
         }
 
         h1 {
-            color: #3498db;
+            color: #2e3330;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -29,9 +29,9 @@
         }
 
         h2 {
-            color: #2ecc71;
+            color: #2e3330;
             margin-bottom: 15px;
-            border-bottom: 2px solid #2ecc71;
+            border-bottom: 2px solid #2e3330;
             padding-bottom: 10px;
             text-align: center;
         }

@@ -29,9 +29,9 @@
         }
 
         h2 {
-            color: #2e3330;
+            color: #666766;
             margin-bottom: 15px;
-            border-bottom: 2px solid #2e3330;
+            border-bottom: 2px solid #666766;
             padding-bottom: 10px;
             text-align: center;
         }

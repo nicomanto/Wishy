@@ -67,9 +67,9 @@
 </head>
 
 <body>
-    <h1>Niccolò Wish List</h1>
+    <h1>{{.Username}} Wish List</h1>
 
-    {{range .}}
+    {{range .Wishes}}
     <div class="category">
         <h2>{{.Cat}}</h2>
         <ul>

@@ -29,17 +29,20 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 		logrus.Errorln(fmt.Errorf("uid not valid: %v", err))
 		return nil, fmt.Errorf("%d", http.StatusBadRequest)
 	}
-	wishes := []models.UserWishes{}
+	// fetch the user
+	user := models.User{}
+	if err := db.Collection(user.DBCollectionName()).FindOne(ctx, bson.M{"_id": uidObjectId}).Decode(&user); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			logrus.Errorln(fmt.Errorf("user %s: %v", uidObjectId.Hex(), err))
+			return nil, fmt.Errorf("%d", http.StatusNotFound)
+		}
+		logrus.Errorln(err)
+		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
+	}
+	// fecth wishes
+	wishes := []models.WishByCategory{}
 	cur, err := db.Collection(models.Wish{}.DBCollectionName()).Aggregate(ctx, []bson.M{
 		{"$match": bson.M{"uid": uidObjectId}},
-		{"$lookup": bson.M{
-			"from":         "users",     // The users collection
-			"localField":   "uid",       // Field in the wishes collection (uid)
-			"foreignField": "_id",       // Field in the users collection (_id)
-			"as":           "user_info", // Field to store the result of the lookup
-		}},
-		// Unwind the user_info array if you expect only one user per wish
-		{"$unwind": "$user_info"},
 		{"$sort": bson.M{"name": 1}},
 		{"$group": bson.M{
 			"_id": "$cat.name",
@@ -47,7 +50,6 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 				"$push": bson.M{"name": "$name", "link": "$link"},
 			},
 		}},
-		{"$addFields": bson.M{"username": "$user_info.name"}},
 		{"$sort": bson.M{"_id": 1}},
 	})
 	if err != nil {
@@ -61,7 +63,10 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 
 	// load html page
 	var responseBody strings.Builder
-	err = templates.HtmlTpls[templates.WishListHtmlTemplateType].Execute(&responseBody, wishes[0])
+	err = templates.HtmlTpls[templates.WishListHtmlTemplateType].Execute(&responseBody, models.UserWishes{
+		Wishes:   wishes,
+		Username: user.Name,
+	})
 	if err != nil {
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)

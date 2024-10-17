@@ -14,6 +14,7 @@ import (
 )
 
 var mockWishesList models.UserWishes
+var mockFriendlyError models.FriendlyError
 
 func TestMain(m *testing.M) {
 	setup()
@@ -69,13 +70,22 @@ func setup() {
 				}},
 		},
 	}
+	mockFriendlyError = models.FriendlyErrorInit("400")
 }
 
-func TestRenderWishListHtmlPage(t *testing.T) {
+func TestRenderHtmlWishListPage(t *testing.T) {
 	r := require.New(t)
 	// load html page
 	var responseBody strings.Builder
 	err := templates.HtmlTpls[templates.WishListHtmlTemplateType].Execute(&responseBody, mockWishesList)
+	r.NoError(err)
+}
+
+func TestRenderHtmlErrorPage(t *testing.T) {
+	r := require.New(t)
+	// load html page
+	var responseBody strings.Builder
+	err := templates.HtmlTpls[templates.ErrorPageHtmlTemplateType].Execute(&responseBody, mockFriendlyError)
 	r.NoError(err)
 }
 

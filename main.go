@@ -42,11 +42,11 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 	return *response, nil*/
 	case "/wishes":
+		var responseBody strings.Builder
 		wishes, err := controllers.GetWishes(ctx, request, db)
 		if err != nil {
 			friendlyError := models.FriendlyErrorInit(err.Error())
 			// load html error page
-			var responseBody strings.Builder
 			err = templates.HtmlTpls[templates.ErrorPageHtmlTemplateType].Execute(&responseBody, friendlyError)
 			if err != nil {
 				logrus.Errorln(err)
@@ -58,9 +58,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			response, e := common.HTMLResponse(responseBody.String())
 			return *response, e
 		}
-
 		// load html wishlist page
-		var responseBody strings.Builder
 		err = templates.HtmlTpls[templates.WishListHtmlTemplateType].Execute(&responseBody, wishes)
 		if err != nil {
 			logrus.Errorln(err)

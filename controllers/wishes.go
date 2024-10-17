@@ -5,10 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
-	"wishy/common"
 	"wishy/models"
-	"wishy/templates"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/sirupsen/logrus"
@@ -17,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) (*events.APIGatewayProxyResponse, error) {
+func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) (*models.UserWishes, error) {
 	// get uid
 	uid, exists := request.QueryStringParameters["uid"]
 	if !exists || uid == "" {
@@ -60,16 +57,5 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
-
-	// load html page
-	var responseBody strings.Builder
-	err = templates.HtmlTpls[templates.WishListHtmlTemplateType].Execute(&responseBody, models.UserWishes{
-		Wishes:   wishes,
-		Username: user.Name,
-	})
-	if err != nil {
-		logrus.Errorln(err)
-		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
-	}
-	return common.HTMLResponse(responseBody.String())
+	return &models.UserWishes{Wishes: wishes, Username: user.Name}, nil
 }

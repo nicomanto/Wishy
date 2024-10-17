@@ -3,14 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
-	"strconv"
+	"strings"
+	"wishy/common"
 	"wishy/controllers"
+	"wishy/models"
 	"wishy/mongodb"
 	"wishy/templates"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/sirupsen/logrus"
 )
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -38,18 +42,35 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 	return *response, nil*/
 	case "/wishes":
-		response, err := controllers.GetWishes(ctx, request, db)
+		wishes, err := controllers.GetWishes(ctx, request, db)
 		if err != nil {
-			errInt, e := strconv.Atoi(err.Error())
-			if e != nil {
-				return events.APIGatewayProxyResponse{}, fmt.Errorf("error: %v - %v", err, e)
+			friendlyError := models.FriendlyErrorInit(err.Error())
+			// load html error page
+			var responseBody strings.Builder
+			err = templates.HtmlTpls[templates.ErrorPageHtmlTemplateType].Execute(&responseBody, friendlyError)
+			if err != nil {
+				logrus.Errorln(err)
+				return events.APIGatewayProxyResponse{
+					StatusCode: http.StatusInternalServerError,
+					Headers:    map[string]string{"Content-Type": "application/json"},
+				}, fmt.Errorf("get wishes: %v", err)
 			}
+			response, e := common.HTMLResponse(responseBody.String())
+			return *response, e
+		}
+
+		// load html wishlist page
+		var responseBody strings.Builder
+		err = templates.HtmlTpls[templates.WishListHtmlTemplateType].Execute(&responseBody, wishes)
+		if err != nil {
+			logrus.Errorln(err)
 			return events.APIGatewayProxyResponse{
-				StatusCode: errInt,
+				StatusCode: http.StatusInternalServerError,
 				Headers:    map[string]string{"Content-Type": "application/json"},
 			}, fmt.Errorf("get wishes: %v", err)
 		}
-		return *response, nil
+		response, e := common.HTMLResponse(responseBody.String())
+		return *response, e
 	default:
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,

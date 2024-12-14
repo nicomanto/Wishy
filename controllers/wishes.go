@@ -39,7 +39,7 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 	// fecth wishes
 	wishes := []models.WishByCategory{}
 	cur, err := db.Collection(models.Wish{}.DBCollectionName()).Aggregate(ctx, []bson.M{
-		{"$match": bson.M{"uid": uidObjectId}},
+		{"$match": bson.M{"uid": uidObjectId, "active": true}},
 		{"$sort": bson.M{"name": 1}},
 		{"$group": bson.M{
 			"_id": "$cat.name",

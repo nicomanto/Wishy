@@ -10,6 +10,7 @@ type Wish struct {
 	Link     string             `json:"link" bson:"link"`
 	Category BaseCategory       `json:"cat" bson:"cat"`
 	UserId   primitive.ObjectID `json:"uid" bson:"uid"`
+	Active   bool               `json:"active" bson:"active"`
 }
 
 func (c Wish) DBCollectionName() string {

@@ -32,40 +32,48 @@ func setup() {
 			{
 				Cat: "cat-1",
 				Wishes: []struct {
-					Name string "json:\"name\" bson:\"name\""
-					Link string "json:\"link\" bson:\"link\""
+					Name       string                "json:\"name\" bson:\"name\""
+					Link       string                "json:\"link\" bson:\"link\""
+					Preference models.PreferenceType `json:"preference" bson:"preference"`
 				}{
 					{
-						Name: "wish-cat-1-name-1",
-						Link: "wish-cat-1-link-1",
+						Name:       "wish-cat-1-name-1",
+						Link:       "wish-cat-1-link-1",
+						Preference: models.Low,
 					},
 					{
-						Name: "wish-cat-1-name-2",
-						Link: "wish-cat-1-link-2",
+						Name:       "wish-cat-1-name-2",
+						Link:       "wish-cat-1-link-2",
+						Preference: models.Medium,
 					},
 					{
-						Name: "wish-cat-1-name-3",
-						Link: "wish-cat-1-link-3",
+						Name:       "wish-cat-1-name-3",
+						Link:       "wish-cat-1-link-3",
+						Preference: models.High,
 					},
 				},
 			},
 			{
 				Cat: "cat-2",
 				Wishes: []struct {
-					Name string "json:\"name\" bson:\"name\""
-					Link string "json:\"link\" bson:\"link\""
+					Name       string                "json:\"name\" bson:\"name\""
+					Link       string                "json:\"link\" bson:\"link\""
+					Preference models.PreferenceType `json:"preference" bson:"preference"`
 				}{
 					{
-						Name: "wish-cat-2-name-1",
-						Link: "wish-cat-2-link-1",
+						Name:       "wish-cat-2-name-1",
+						Link:       "wish-cat-2-link-1",
+						Preference: models.High,
 					},
 					{
-						Name: "wish-cat-2-name-2",
-						Link: "wish-cat-2-link-2",
+						Name:       "wish-cat-2-name-2",
+						Link:       "wish-cat-2-link-2",
+						Preference: models.High,
 					},
 					{
-						Name: "wish-cat-2-name-3",
-						Link: "wish-cat-2-link-3",
+						Name:       "wish-cat-2-name-3",
+						Link:       "wish-cat-2-link-3",
+						Preference: models.High,
 					},
 				}},
 		},

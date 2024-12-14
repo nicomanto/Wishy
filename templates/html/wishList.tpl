@@ -64,6 +64,14 @@
             width: 1em; /* adjust spacing between bullet point and wish name */
             margin-left: 0.5em; /* align bullet point with previous headline */
         }
+        
+        .preference {
+            font-weight: bold;
+            border-radius: 5px;
+            padding: 3px 8px;
+            font-size: 0.9em;
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -77,6 +85,15 @@
             {{range .Wishes}}
             <li class="wish-item">
                 <a href="{{.Link}}" target="_blank">{{.Name}}</a>
+                {{if eq .Preference 3}}
+                    <span class="preference">&#x2B50;&#x2B50;&#x2B50;</span>
+                {{end}}
+                {{if eq .Preference 2}}
+                    <span class="preference">&#x2B50;&#x2B50</span>
+                {{end}}
+                {{if eq .Preference 1}}
+                    <span class="preference">&#x2B50;</span>
+                {{end}}
             </li>
             {{end}}
         </ul>

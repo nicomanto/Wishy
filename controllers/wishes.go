@@ -59,9 +59,7 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
 	// get the newest wishes for set last update
-	// Initialize variables to store the newest time and its corresponding item
 	var newest time.Time
-	// Iterate over the array
 	for i := range wishes {
 		for j := range wishes[i].Wishes {
 			if wishes[i].Wishes[j].Ts.After(newest) {

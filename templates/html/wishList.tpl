@@ -21,6 +21,14 @@
             margin-bottom: 20px;
         }
 
+        .last-update {
+            text-align: center;
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
         .category {
             background-color: #ffffff;
             margin: 20px 0;
@@ -77,6 +85,7 @@
 
 <body>
     <h1>{{.Username}} Wish List</h1>
+    <div class="last-update">Last update: {{.LastUpdate}}</div>
 
     {{range .Wishes}}
     <div class="category">

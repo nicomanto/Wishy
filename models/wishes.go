@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -12,6 +14,7 @@ type Wish struct {
 	UserId     primitive.ObjectID `json:"uid" bson:"uid"`
 	Active     bool               `json:"active" bson:"active"`
 	Preference PreferenceType     `json:"preference" bson:"preference"`
+	Ts         time.Time          `json:"ts" bson:"ts"`
 }
 
 func (c Wish) DBCollectionName() string {
@@ -32,10 +35,12 @@ type WishByCategory struct {
 		Name       string         `json:"name" bson:"name"`
 		Link       string         `json:"link" bson:"link"`
 		Preference PreferenceType `json:"preference" bson:"preference"`
+		Ts         time.Time      `json:"ts" bson:"ts"`
 	} `json:"wishes" bson:"wishes"`
 }
 
 type UserWishes struct {
-	Wishes   []WishByCategory `json:"wishes" bson:"wishes"`
-	Username string           `json:"username" bson:"username"`
+	Wishes     []WishByCategory `json:"wishes" bson:"wishes"`
+	Username   string           `json:"username" bson:"username"`
+	LastUpdate string           `json:"last_update" bson:"last_update"`
 }

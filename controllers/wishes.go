@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 	"wishy/models"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -44,7 +45,7 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 		{"$group": bson.M{
 			"_id": "$cat.name",
 			"wishes": bson.M{
-				"$push": bson.M{"name": "$name", "link": "$link", "preference": "$preference"},
+				"$push": bson.M{"name": "$name", "link": "$link", "preference": "$preference", "ts": "$ts"},
 			},
 		}},
 		{"$sort": bson.M{"_id": 1}},
@@ -57,5 +58,16 @@ func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *m
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
 	}
-	return &models.UserWishes{Wishes: wishes, Username: user.Name}, nil
+	// get the newest wishes for set last update
+	// Initialize variables to store the newest time and its corresponding item
+	var newest time.Time
+	// Iterate over the array
+	for i := range wishes {
+		for j := range wishes[i].Wishes {
+			if wishes[i].Wishes[j].Ts.After(newest) {
+				newest = wishes[i].Wishes[j].Ts
+			}
+		}
+	}
+	return &models.UserWishes{Wishes: wishes, Username: user.Name, LastUpdate: newest.Format("02/01/2006")}, nil
 }

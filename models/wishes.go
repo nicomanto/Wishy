@@ -35,7 +35,6 @@ type WishByCategory struct {
 		Name       string         `json:"name" bson:"name"`
 		Link       string         `json:"link" bson:"link"`
 		Preference PreferenceType `json:"preference" bson:"preference"`
-		Ts         time.Time      `json:"ts" bson:"ts"`
 	} `json:"wishes" bson:"wishes"`
 }
 

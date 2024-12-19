@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 	"wishy/controllers"
 	"wishy/models"
 	"wishy/templates"
@@ -36,7 +35,6 @@ func setup() {
 					Name       string                "json:\"name\" bson:\"name\""
 					Link       string                "json:\"link\" bson:\"link\""
 					Preference models.PreferenceType `json:"preference" bson:"preference"`
-					Ts         time.Time             `json:"ts" bson:"ts"`
 				}{
 					{
 						Name:       "wish-cat-1-name-1",
@@ -61,7 +59,6 @@ func setup() {
 					Name       string                "json:\"name\" bson:\"name\""
 					Link       string                "json:\"link\" bson:\"link\""
 					Preference models.PreferenceType `json:"preference" bson:"preference"`
-					Ts         time.Time             `json:"ts" bson:"ts"`
 				}{
 					{
 						Name:       "wish-cat-2-name-1",

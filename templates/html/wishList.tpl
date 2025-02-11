@@ -5,110 +5,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://wishyicons.s3.eu-west-1.amazonaws.com/gift-box.png">
-    <title>{{.Username}} Wish List</title>
+    <title>{{.Username}}'s Wish List</title>
     <style>
+        /* General Styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
             color: #333;
+            text-align: center;
+        }
+
+        /* Page Header */
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
         }
 
         h1 {
-            color: #2e3330;
-            text-align: center;
-            margin-bottom: 20px;
+            font-size: 28px;
+            color: #2c3e50;
         }
 
         .last-update {
-            text-align: center;
-            font-size: 0.8em;
-            color: #666;
-            margin-top: 0;
-            margin-bottom: 20px;
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 30px;
         }
 
+        /* Category Card */
         .category {
-            background-color: #ffffff;
+            background: #fff;
             margin: 20px 0;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: left;
         }
 
         h2 {
-            color: #666766;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #666766;
+            font-size: 20px;
+            color: #2980b9;
+            border-bottom: 3px solid #2980b9;
             padding-bottom: 10px;
-            text-align: center;
+            margin-bottom: 15px;
         }
 
+        /* Wishlist Items */
         ul {
-            list-style-type: none;
+            list-style: none;
             padding: 0;
         }
 
         .wish-item {
-            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #fafafa;
+            margin: 8px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .wish-item:hover {
+            transform: translateY(-2px);
         }
 
         .wish-item a {
             color: #3498db;
+            font-weight: 600;
             text-decoration: none;
-            font-weight: bold;
         }
 
         .wish-item a:hover {
             text-decoration: underline;
         }
 
-        .wish-item::before {
-            content: "\2022"; /* bullet point character */
-            color: #666766; /* color of the bullet point */
-            font-weight: bold; /* make the bullet point bold */
-            display: inline-block;
-            width: 1em; /* adjust spacing between bullet point and wish name */
-            margin-left: 0.5em; /* align bullet point with previous headline */
-        }
-        
+        /* Preference Stars */
         .preference {
-            font-weight: bold;
-            border-radius: 5px;
-            padding: 3px 8px;
-            font-size: 0.9em;
-            color: #fff;
+            font-size: 18px;
+            color: #f1c40f;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h1>{{.Username}} Wish List</h1>
-    <div class="last-update">Last update: {{.LastUpdate}}</div>
+    <div class="container">
+        <h1>🎁 {{.Username}}'s Wish List</h1>
+        <div class="last-update">Last updated: {{.LastUpdate}}</div>
 
-    {{range .Wishes}}
-    <div class="category">
-        <h2>{{.Cat}}</h2>
-        <ul>
-            {{range .Wishes}}
-            <li class="wish-item">
-                <a href="{{.Link}}" target="_blank">{{.Name}}</a>
-                {{if eq .Preference 3}}
-                    <span class="preference">&#x2B50;&#x2B50;&#x2B50;</span>
+        {{range .Wishes}}
+        <div class="category">
+            <h2>{{.Cat}}</h2>
+            <ul>
+                {{range .Wishes}}
+                <li class="wish-item">
+                    <a href="{{.Link}}" target="_blank">{{.Name}}</a>
+                    <span class="preference">
+                        {{if eq .Preference 3}} ⭐⭐⭐ {{end}}
+                        {{if eq .Preference 2}} ⭐⭐ {{end}}
+                        {{if eq .Preference 1}} ⭐ {{end}}
+                    </span>
+                </li>
                 {{end}}
-                {{if eq .Preference 2}}
-                    <span class="preference">&#x2B50;&#x2B50</span>
-                {{end}}
-                {{if eq .Preference 1}}
-                    <span class="preference">&#x2B50;</span>
-                {{end}}
-            </li>
-            {{end}}
-        </ul>
+            </ul>
+        </div>
+        {{end}}
     </div>
-    {{end}}
-
 </body>
 
 </html>

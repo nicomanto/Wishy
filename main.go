@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -71,7 +72,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		response, e := common.HTMLResponse(responseBody.String())
 		return *response, e
 	case "/wishes/pdf":
-		var responseBody strings.Builder
+		/*var responseBody strings.Builder
 		wishes, err := controllers.GetWishes(ctx, request, db)
 		if err != nil {
 			friendlyError := models.FriendlyErrorInit(err.Error())
@@ -102,9 +103,22 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			}
 			response, e := common.HTMLResponse(responseBody.String())
 			return *response, e
+		}*/
+		// Open the file
+		file, err := os.Open("./templates/sample.pdf")
+		if err != nil {
+			return events.APIGatewayProxyResponse{}, err
+		}
+		defer file.Close()
+
+		// Read the file content as bytes
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			return events.APIGatewayProxyResponse{}, err
 		}
 		// Convert PDF bytes to base64 (required for AWS API Gateway)
-		pdfBase64 := base64.StdEncoding.EncodeToString(pdfBytes)
+		//pdfBase64 := base64.StdEncoding.EncodeToString(pdfBytes)
+		pdfBase64 := base64.StdEncoding.EncodeToString(data)
 		response, e := common.PDFResponse(pdfBase64, "wishlist.pdf", true)
 		return *response, e
 	default:

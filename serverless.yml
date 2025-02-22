@@ -20,4 +20,6 @@ functions:
       - http:
           path: /wishes/pdf
           method: GET
+          contentHandling: CONVERT_TO_BINARY
+
 

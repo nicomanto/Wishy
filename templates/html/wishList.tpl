@@ -17,11 +17,13 @@
             text-align: center;
         }
 
-        /* Page Header */
         .container {
             max-width: 600px;
             margin: 40px auto;
             padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -29,13 +31,38 @@
             color: #2c3e50;
         }
 
+        /* Last Update & Button Container */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 0;
+            border-bottom: 2px solid #ddd;
+        }
+
         .last-update {
             font-size: 14px;
             color: #777;
-            margin-bottom: 30px;
         }
 
-        /* Category Card */
+        /* Download Button */
+        .download-btn {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #1f6690;
+        }
+
         .category {
             background: #fff;
             margin: 20px 0;
@@ -53,7 +80,6 @@
             margin-bottom: 15px;
         }
 
-        /* Wishlist Items */
         ul {
             list-style: none;
             padding: 0;
@@ -85,16 +111,24 @@
             text-decoration: underline;
         }
 
-        /* Preference Stars */
         .preference {
             font-size: 18px;
             color: #f1c40f;
         }
 
-        /* Responsive Design */
         @media (max-width: 600px) {
             .container {
                 padding: 10px;
+            }
+
+            .header-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .download-btn {
+                width: 100%;
             }
         }
     </style>
@@ -103,7 +137,12 @@
 <body>
     <div class="container">
         <h1>🎁 {{.Username}}'s Wish List</h1>
-        <div class="last-update">Last updated: {{.LastUpdate}}</div>
+
+        <!-- Last update and download button -->
+        <div class="header-bar">
+            <div class="last-update">Last updated: {{.LastUpdate}}</div>
+            <button class="download-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+        </div>
 
         {{range .Wishes}}
         <div class="category">
@@ -124,5 +163,28 @@
         {{end}}
     </div>
 </body>
+
+<script>
+    function downloadPDF() {
+        let baseUrl = window.location.origin;
+        let pathParts = window.location.pathname.split('/');
+        let stage = pathParts[1]; // "dev" or "prod"
+
+        // Extract 'uid' from query params
+        let params = new URLSearchParams(window.location.search);
+        let uid = params.get("uid");
+
+        if (!uid) {
+            alert("User ID not found!");
+            return;
+        }
+
+        // Build the correct URL
+        let pdfUrl = `${baseUrl}/${stage}/wishes/pdf?uid=${uid}`;
+
+        // Redirect to start the download
+        window.location.href = pdfUrl;
+    }
+</script>
 
 </html>

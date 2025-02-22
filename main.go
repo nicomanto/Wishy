@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
@@ -68,6 +69,43 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			}, fmt.Errorf("get wishes: %v", err)
 		}
 		response, e := common.HTMLResponse(responseBody.String())
+		return *response, e
+	case "/wishes/pdf":
+		var responseBody strings.Builder
+		wishes, err := controllers.GetWishes(ctx, request, db)
+		if err != nil {
+			friendlyError := models.FriendlyErrorInit(err.Error())
+			// load html error page
+			err = templates.HtmlTpls[templates.ErrorPageHtmlTemplateType].Execute(&responseBody, friendlyError)
+			if err != nil {
+				logrus.Errorln(err)
+				return events.APIGatewayProxyResponse{
+					StatusCode: http.StatusInternalServerError,
+					Headers:    map[string]string{"Content-Type": "application/json"},
+				}, fmt.Errorf("get wishes: %v", err)
+			}
+			response, e := common.HTMLResponse(responseBody.String())
+			return *response, e
+		}
+		// Generate PDF
+		pdfBytes, err := wishes.GenerateWishlistPDF()
+		if err != nil {
+			friendlyError := models.FriendlyErrorInit(err.Error())
+			// load html error page
+			err = templates.HtmlTpls[templates.ErrorPageHtmlTemplateType].Execute(&responseBody, friendlyError)
+			if err != nil {
+				logrus.Errorln(err)
+				return events.APIGatewayProxyResponse{
+					StatusCode: http.StatusInternalServerError,
+					Headers:    map[string]string{"Content-Type": "application/json"},
+				}, fmt.Errorf("get wishes: %v", err)
+			}
+			response, e := common.HTMLResponse(responseBody.String())
+			return *response, e
+		}
+		// Convert PDF bytes to base64 (required for AWS API Gateway)
+		pdfBase64 := base64.StdEncoding.EncodeToString(pdfBytes)
+		response, e := common.PDFResponse(pdfBase64, wishes.Username+"-wishlist.pdf", true)
 		return *response, e
 	default:
 		return events.APIGatewayProxyResponse{

@@ -25,3 +25,18 @@ func HTMLResponse(body string) (*events.APIGatewayProxyResponse, error) {
 		Body:       body,
 	}, nil
 }
+
+func PDFResponse(body, filename string, forceDownload bool) (*events.APIGatewayProxyResponse, error) {
+	headers := map[string]string{"Content-Type": "application/pdf"}
+	if forceDownload {
+		headers["Content-Disposition"] = "attachment; filename=" + filename
+	} else {
+		headers["Content-Disposition"] = "inline; filename=" + filename
+	}
+	return &events.APIGatewayProxyResponse{
+		StatusCode:      200,
+		Headers:         headers,
+		Body:            body,
+		IsBase64Encoded: true,
+	}, nil
+}

@@ -7,6 +7,9 @@ provider:
   stage: ${env:STAGE, 'dev'}
   binaryMediaTypes:
     - application/pdf
+  apiGateway:
+    binaryMediaTypes:
+      - application/pdf
    
 
 functions:

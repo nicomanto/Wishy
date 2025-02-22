@@ -38,7 +38,7 @@ func PDFResponse(body, filename string, forceDownload bool) (*events.APIGatewayP
 	return &events.APIGatewayProxyResponse{
 		StatusCode:      200,
 		Headers:         headers,
-		Body:            body,
-		IsBase64Encoded: true,
+		Body:            "DEBUG: " + body[:100], // Only first 100 chars
+		IsBase64Encoded: false,                  // Disable encoding
 	}, nil
 }

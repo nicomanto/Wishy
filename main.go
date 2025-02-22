@@ -105,7 +105,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}
 		// Convert PDF bytes to base64 (required for AWS API Gateway)
 		pdfBase64 := base64.StdEncoding.EncodeToString(pdfBytes)
-		response, e := common.PDFResponse(pdfBase64, wishes.Username+"-wishlist.pdf", true)
+		response, e := common.PDFResponse(pdfBase64, "wishlist.pdf", true)
 		return *response, e
 	default:
 		return events.APIGatewayProxyResponse{

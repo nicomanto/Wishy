@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
@@ -103,7 +104,8 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			return *response, e
 		}
 		// Convert PDF bytes to base64 (required for AWS API Gateway)
-		response, e := common.PDFResponse(string(pdfBytes), "wishlist.pdf", true)
+		pdfBase64 := base64.StdEncoding.EncodeToString(pdfBytes)
+		response, e := common.PDFResponse(pdfBase64, "wishlist.pdf", true)
 		return *response, e
 	default:
 		return events.APIGatewayProxyResponse{

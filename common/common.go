@@ -36,8 +36,9 @@ func PDFResponse(body, filename string, forceDownload bool) (*events.APIGatewayP
 	}
 	fmt.Println("Encoded PDF length:", len(body)) // Should be > 1KB
 	return &events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers:    headers,
-		Body:       body,
+		StatusCode:      200,
+		Headers:         headers,
+		Body:            body,
+		IsBase64Encoded: true,
 	}, nil
 }

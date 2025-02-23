@@ -23,5 +23,10 @@ functions:
       - http:
           path: /wishes/pdf
           method: GET
+          integration: lambda
+          response:
+            headers:
+              Content-Type: "'application/pdf'"
+              Content-Disposition: "'attachment; filename=wishlist.pdf'"
 
 

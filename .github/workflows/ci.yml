@@ -17,7 +17,7 @@ jobs:
       - name: Test
         run: go test ./... -v
   deploy-lambda:
-    name: deploy lambda function
+    name: deploy
     runs-on: ubuntu-latest
     needs: tests
     if: github.ref == 'refs/heads/main'

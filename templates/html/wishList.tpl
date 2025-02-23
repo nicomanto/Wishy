@@ -163,7 +163,6 @@
         {{end}}
     </div>
 </body>
-
 <script>
     async function downloadPDF() {
     let baseUrl = window.location.origin;
@@ -209,5 +208,4 @@
     }
 }
 </script>
-
 </html>

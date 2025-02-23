@@ -27,6 +27,5 @@ functions:
           response:
             headers:
               Content-Type: "'application/pdf'"
-              Content-Disposition: "'attachment; filename=wishlist.pdf'"
 
 

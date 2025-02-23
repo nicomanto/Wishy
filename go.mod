@@ -4,6 +4,7 @@ go 1.21.6
 
 require (
 	github.com/aws/aws-lambda-go v1.45.0
+	github.com/signintech/gopdf v0.29.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.7.2
 	go.mongodb.org/mongo-driver v1.13.1
@@ -14,6 +15,8 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
+	github.com/phpdave11/gofpdi v1.0.14-0.20211212211723-1f10f9844311 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect

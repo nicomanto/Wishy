@@ -109,3 +109,10 @@ func TestGetWishesErrors(t *testing.T) {
 	r.Nil(resp)
 	r.Equal("400", err.Error())
 }
+
+func TestGenerateWishlistPDF(t *testing.T) {
+	r := require.New(t)
+	b, err := mockWishesList.GenerateWishlistPDF()
+	r.NoError(err)
+	r.NotNil(b)
+}

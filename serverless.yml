@@ -5,6 +5,9 @@ provider:
   runtime: provided.al2023
   region: ${env:AWS_REGION, 'eu-west-1'}
   stage: ${env:STAGE, 'dev'}
+  apiGateway:
+    binaryMediaTypes:
+      - "application/pdf" # Allow API Gateway to return PDFs as binary
    
 
 functions:
@@ -17,4 +20,8 @@ functions:
       - http:
           path: /wishes
           method: GET
+      - http:
+          path: /wishes/pdf
+          method: GET
+
 

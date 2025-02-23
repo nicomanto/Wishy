@@ -5,6 +5,9 @@ provider:
   runtime: provided.al2023
   region: ${env:AWS_REGION, 'eu-west-1'}
   stage: ${env:STAGE, 'dev'}
+  apiGateway:
+  binaryMediaTypes:
+    - "application/pdf"
    
 
 functions:
@@ -20,5 +23,9 @@ functions:
       - http:
           path: /wishes/pdf
           method: GET
+          response:
+            headers:
+              Content-Type: "'application/pdf'"
+          contentHandling: CONVERT_TO_BINARY
 
 

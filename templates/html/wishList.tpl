@@ -165,26 +165,49 @@
 </body>
 
 <script>
-    function downloadPDF() {
-        let baseUrl = window.location.origin;
-        let pathParts = window.location.pathname.split('/');
-        let stage = pathParts[1]; // "dev" or "prod"
+    async function downloadPDF() {
+    let baseUrl = window.location.origin;
+    let pathParts = window.location.pathname.split('/');
+    let stage = pathParts[1]; // "dev" or "prod"
 
-        // Extract 'uid' from query params
-        let params = new URLSearchParams(window.location.search);
-        let uid = params.get("uid");
+    let params = new URLSearchParams(window.location.search);
+    let uid = params.get("uid");
 
-        if (!uid) {
-            alert("User ID not found!");
-            return;
+    if (!uid) {
+        alert("User ID not found!");
+        return;
+    }
+
+    // API URL for PDF
+    let pdfUrl = `${baseUrl}/${stage}/wishes/pdf?uid=${uid}`;
+
+    try {
+        const response = await fetch(pdfUrl, {
+            method: "GET",
+            headers: {
+                "Accept": "application/pdf" // Force request to expect a PDF
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch PDF");
         }
 
-        // Build the correct URL
-        let pdfUrl = `${baseUrl}/${stage}/wishes/pdf?uid=${uid}`;
+        // Convert response to a Blob
+        const pdfBlob = await response.blob();
 
-        // Redirect to start the download
-        window.location.href = pdfUrl;
+        // Create a download link
+        const downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(pdfBlob);
+        downloadLink.download = "wishlist.pdf"; // File name
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    } catch (error) {
+        console.error("Error downloading PDF:", error);
+        alert("Error downloading PDF. Please try again.");
     }
+}
 </script>
 
 </html>

@@ -28,7 +28,10 @@ func HTMLResponse(body string) (*events.APIGatewayProxyResponse, error) {
 }
 
 func PDFResponse(body, filename string, forceDownload bool) (*events.APIGatewayProxyResponse, error) {
-	headers := map[string]string{"Content-Type": "application/pdf"}
+	headers := map[string]string{"Content-Type": "application/pdf",
+		"Access-Control-Allow-Origin":  "*", // ✅ Allows all origins
+		"Access-Control-Allow-Methods": "GET, OPTIONS",
+		"Access-Control-Allow-Headers": "Content-Type"}
 	if forceDownload {
 		headers["Content-Disposition"] = "attachment; filename=" + filename
 	} else {

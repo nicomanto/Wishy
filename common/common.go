@@ -2,7 +2,6 @@ package common
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -34,11 +33,10 @@ func PDFResponse(body, filename string, forceDownload bool) (*events.APIGatewayP
 	} else {
 		headers["Content-Disposition"] = "inline; filename=" + filename
 	}
-	fmt.Println("Encoded PDF length:", len(body)) // Should be > 1KB
 	return &events.APIGatewayProxyResponse{
 		StatusCode:      200,
 		Headers:         headers,
-		Body:            body, // Only first 100 chars
-		IsBase64Encoded: true, // Disable encoding
+		Body:            body,
+		IsBase64Encoded: true,
 	}, nil
 }

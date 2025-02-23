@@ -196,7 +196,7 @@
         let filename = "wishlist.pdf"; // Default filename
         const contentDisposition = response.headers.get("Content-Disposition");
         if (contentDisposition) {
-            const match = contentDisposition.match(/filename="(.+?)"/);
+            const match = contentDisposition.match(/filename="?([^";]+)"?/);
             if (match && match[1]) {
                 filename = match[1];
             }

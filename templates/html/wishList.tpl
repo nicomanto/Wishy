@@ -192,13 +192,23 @@
             throw new Error("Failed to fetch PDF");
         }
 
+        // Extract filename from Content-Disposition header
+        let filename = "wishlist.pdf"; // Default filename
+        const contentDisposition = response.headers.get("Content-Disposition");
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename="(.+?)"/);
+            if (match && match[1]) {
+                filename = match[1];
+            }
+        }
+
         // Convert response to a Blob
         const pdfBlob = await response.blob();
 
         // Create a download link
         const downloadLink = document.createElement("a");
         downloadLink.href = URL.createObjectURL(pdfBlob);
-        downloadLink.download = "wishlist.pdf"; // File name
+        downloadLink.download = filename
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);

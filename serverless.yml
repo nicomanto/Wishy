@@ -23,7 +23,7 @@ functions:
           integration: lambda
           response:
             headers:
-              Content-Type: "'application/pdf'"
+              Content-Type: "application/pdf"
           contentHandling: CONVERT_TO_BINARY
 
 

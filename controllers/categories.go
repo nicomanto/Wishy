@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetCategeories(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) ([]models.Category, error) {
+func GetCategories(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) ([]models.Category, error) {
 	categories := []models.Category{}
 	cur, err := db.Collection(models.Category{}.DBCollectionName()).Find(ctx, bson.M{})
 	if err != nil {

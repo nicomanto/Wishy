@@ -97,15 +97,15 @@ func TestRenderHtmlErrorPage(t *testing.T) {
 	r.NoError(err)
 }
 
-func TestGetWishesErrors(t *testing.T) {
+func TestGetUserWishesErrors(t *testing.T) {
 	r := require.New(t)
-	resp, err := controllers.GetWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{}}, nil)
+	resp, err := controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{}}, nil)
 	r.Nil(resp)
 	r.Equal("400", err.Error())
-	resp, err = controllers.GetWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": ""}}, nil)
+	resp, err = controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": ""}}, nil)
 	r.Nil(resp)
 	r.Equal("400", err.Error())
-	resp, err = controllers.GetWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": "aasdf"}}, nil)
+	resp, err = controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": "aasdf"}}, nil)
 	r.Nil(resp)
 	r.Equal("400", err.Error())
 }

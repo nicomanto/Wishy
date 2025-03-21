@@ -10,12 +10,19 @@ import (
 	"wishy/common"
 	"wishy/controllers"
 	"wishy/models"
-	"wishy/mongodb"
+	"wishy/services/mongodb"
 	"wishy/templates"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/sirupsen/logrus"
+)
+
+type Endpoint string
+
+const (
+	WishesEndpoint    Endpoint = "/wishes"
+	WishesPDFEndpoint Endpoint = WishesEndpoint + "/pdf"
 )
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -26,12 +33,12 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	// pre load html page
 	templates.InitHtmlTpls()
 
-	endpoint := request.Path
+	endpoint := Endpoint(request.Path)
 	// Execute different logic based on the endpoint
 	switch endpoint {
-	case "/wishes":
+	case WishesEndpoint:
 		var responseBody strings.Builder
-		wishes, err := controllers.GetWishes(ctx, request, db)
+		wishes, err := controllers.GetUserWishes(ctx, request, db)
 		if err != nil {
 			friendlyError := models.FriendlyErrorInit(err.Error())
 			// load html error page
@@ -57,9 +64,9 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}
 		response, e := common.HTMLResponse(responseBody.String())
 		return *response, e
-	case "/wishes/pdf":
+	case WishesPDFEndpoint:
 		var responseBody strings.Builder
-		wishes, err := controllers.GetWishes(ctx, request, db)
+		wishes, err := controllers.GetUserWishes(ctx, request, db)
 		if err != nil {
 			friendlyError := models.FriendlyErrorInit(err.Error())
 			// load html error page

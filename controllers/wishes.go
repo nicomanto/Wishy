@@ -14,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) (*models.UserWishes, error) {
+func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, db *mongo.Database) (*models.UserWishes, error) {
 	// get uid
 	uid, exists := request.QueryStringParameters["uid"]
 	if !exists || uid == "" {

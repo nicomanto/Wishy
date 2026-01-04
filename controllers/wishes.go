@@ -60,7 +60,7 @@ func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, d
 	// set is recent
 	for i := range wishes {
 		for j := range wishes[i].Wishes {
-			wishes[i].Wishes[j].SetRecent(2)
+			wishes[i].Wishes[j].SetRecent(user.IsRecentMonthConfig)
 		}
 	}
 	// get the newest wishes for set last update

@@ -25,10 +25,11 @@ type Wish struct {
 	Active   bool               `json:"active" bson:"active"`
 }
 
-func (w *BaseWish) SetRecent(month int) bool {
-	threeMonthsAgo := time.Now().AddDate(0, -month, 0)
-	w.IsRecent = w.Ts.After(threeMonthsAgo)
-	return w.IsRecent
+func (w *BaseWish) SetRecent(month int) {
+	fmt.Print(time.Now().String())
+	monthsAgo := time.Now().AddDate(0, -month, 0)
+	w.IsRecent = w.Ts.After(monthsAgo)
+	fmt.Print(w.IsRecent)
 }
 
 func (c BaseWish) DBCollectionName() string {

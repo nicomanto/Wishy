@@ -44,7 +44,7 @@ func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, d
 		{"$group": bson.M{
 			"_id": "$cat.name",
 			"wishes": bson.M{
-				"$push": bson.M{"name": "$name", "link": "$link", "preference": "$preference", "recent": "$recent"},
+				"$push": bson.M{"name": "$name", "link": "$link", "preference": "$preference", "ts": "$ts"},
 			},
 		}},
 		{"$sort": bson.M{"_id": 1}},
@@ -52,7 +52,7 @@ func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, d
 	// set is recent
 	for i := range wishes {
 		for j := range wishes[i].Wishes {
-			wishes[i].Wishes[j].SetRecent(3)
+			wishes[i].Wishes[j].SetRecent(2)
 		}
 	}
 	if err != nil {

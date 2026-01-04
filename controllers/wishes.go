@@ -57,7 +57,7 @@ func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, d
 	}
 	for i := range wishes {
 		for j := range wishes[i].Wishes {
-			fmt.Print(wishes[i].Wishes[j].IsRecent)
+			logrus.Errorln(wishes[i].Wishes[j].IsRecent)
 		}
 	}
 	if err != nil {

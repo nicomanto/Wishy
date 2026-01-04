@@ -49,17 +49,6 @@ func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, d
 		}},
 		{"$sort": bson.M{"_id": 1}},
 	})
-	// set is recent
-	for i := range wishes {
-		for j := range wishes[i].Wishes {
-			wishes[i].Wishes[j].SetRecent(2)
-		}
-	}
-	for i := range wishes {
-		for j := range wishes[i].Wishes {
-			logrus.Errorln(wishes[i].Wishes[j].IsRecent)
-		}
-	}
 	if err != nil {
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
@@ -67,6 +56,12 @@ func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, d
 	if err := cur.All(ctx, &wishes); err != nil {
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)
+	}
+	// set is recent
+	for i := range wishes {
+		for j := range wishes[i].Wishes {
+			wishes[i].Wishes[j].SetRecent(2)
+		}
 	}
 	// get the newest wishes for set last update
 	return &models.UserWishes{Wishes: wishes, Username: user.Name, LastUpdate: user.LastWishUpdate.Format("02/01/2006")}, nil

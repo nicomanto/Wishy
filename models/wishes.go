@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/signintech/gopdf"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -27,10 +26,8 @@ type Wish struct {
 }
 
 func (w *BaseWish) SetRecent(month int) {
-	logrus.Errorln(time.Now().String())
 	monthsAgo := time.Now().AddDate(0, -month, 0)
 	w.IsRecent = w.Ts.After(monthsAgo)
-	logrus.Errorln(w.IsRecent)
 }
 
 func (c BaseWish) DBCollectionName() string {

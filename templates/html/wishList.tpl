@@ -131,6 +131,27 @@
                 width: 50%;
             }
         }
+
+        /* Signal / blinking effect */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 rgba(241, 196, 15, 0);
+                background-color: #fafafa;
+            }
+            50% {
+                box-shadow: 0 0 12px rgba(241, 196, 15, 0.8);
+                background-color: #fff8dc;
+            }
+            100% {
+                box-shadow: 0 0 0 rgba(241, 196, 15, 0);
+                background-color: #fafafa;
+            }
+        }
+
+        .signal {
+            animation: pulse 1s infinite;
+            border-left: 6px solid #f1c40f;
+        }
     </style>
 </head>
 
@@ -149,7 +170,7 @@
             <h2>{{.Cat}}</h2>
             <ul>
                 {{range .Wishes}}
-                <li class="wish-item">
+                <li class="wish-item {{if .IsRecent}}signal{{end}}">
                     <a href="{{.Link}}" target="_blank">{{.Name}}</a>
                     <span class="preference">
                         {{if eq .Preference 3}} ⭐⭐⭐ {{end}}

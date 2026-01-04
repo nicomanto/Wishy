@@ -9,15 +9,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Wish struct {
+type BaseWish struct {
 	ID         primitive.ObjectID `json:"id" bson:"_id"`
 	Name       string             `json:"name" bson:"name"`
 	Link       string             `json:"link" bson:"link"`
-	Category   BaseCategory       `json:"cat" bson:"cat"`
-	UserId     primitive.ObjectID `json:"uid" bson:"uid"`
-	Active     bool               `json:"active" bson:"active"`
 	Preference PreferenceType     `json:"preference" bson:"preference"`
-	Ts         time.Time          `json:"ts" bson:"ts"`
+	IsRecent   bool               `json:"recent" bson:"-"`
+}
+
+type Wish struct {
+	BaseWish `json:",inline" bson:",inline"`
+	Category BaseCategory       `json:"cat" bson:"cat"`
+	UserId   primitive.ObjectID `json:"uid" bson:"uid"`
+	Active   bool               `json:"active" bson:"active"`
+	Ts       time.Time          `json:"ts" bson:"ts"`
+}
+
+func (w *Wish) SetRecent(month int) bool {
+	threeMonthsAgo := time.Now().AddDate(0, -month, 0)
+	w.IsRecent = w.Ts.After(threeMonthsAgo)
+	return w.IsRecent
 }
 
 func (c Wish) DBCollectionName() string {
@@ -47,12 +58,8 @@ func (p PreferenceType) String() string {
 }
 
 type WishByCategory struct {
-	Cat    string `json:"cat" bson:"_id"`
-	Wishes []struct {
-		Name       string         `json:"name" bson:"name"`
-		Link       string         `json:"link" bson:"link"`
-		Preference PreferenceType `json:"preference" bson:"preference"`
-	} `json:"wishes" bson:"wishes"`
+	Cat    string     `json:"cat" bson:"_id"`
+	Wishes []BaseWish `json:"wishes" bson:"wishes"`
 }
 
 type UserWishes struct {

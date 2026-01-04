@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 	"wishy/controllers"
 	"wishy/models"
 	"wishy/templates"
@@ -31,11 +32,7 @@ func setup() {
 		Wishes: []models.WishByCategory{
 			{
 				Cat: "cat-1",
-				Wishes: []struct {
-					Name       string                "json:\"name\" bson:\"name\""
-					Link       string                "json:\"link\" bson:\"link\""
-					Preference models.PreferenceType `json:"preference" bson:"preference"`
-				}{
+				Wishes: []models.BaseWish{
 					{
 						Name:       "wish-cat-1-name-1",
 						Link:       "wish-cat-1-link-1",
@@ -55,11 +52,7 @@ func setup() {
 			},
 			{
 				Cat: "cat-2",
-				Wishes: []struct {
-					Name       string                "json:\"name\" bson:\"name\""
-					Link       string                "json:\"link\" bson:\"link\""
-					Preference models.PreferenceType `json:"preference" bson:"preference"`
-				}{
+				Wishes: []models.BaseWish{
 					{
 						Name:       "wish-cat-2-name-1",
 						Link:       "wish-cat-2-link-1",
@@ -115,4 +108,17 @@ func TestGenerateWishlistPDF(t *testing.T) {
 	b, err := mockWishesList.GenerateWishlistPDF()
 	r.NoError(err)
 	r.NotNil(b)
+}
+
+func TestSetRecent(t *testing.T) {
+	r := require.New(t)
+	wish := models.Wish{
+		Ts: time.Now().AddDate(0, -2, 0),
+	}
+	r.False(wish.IsRecent)
+	wish.SetRecent(3)
+	r.True(wish.IsRecent)
+	wish.Ts = time.Now().AddDate(0, -4, 0)
+	wish.SetRecent(3)
+	r.False(wish.IsRecent)
 }

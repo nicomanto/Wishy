@@ -112,7 +112,7 @@ func TestGenerateWishlistPDF(t *testing.T) {
 
 func TestSetRecent(t *testing.T) {
 	r := require.New(t)
-	wish := models.Wish{
+	wish := models.BaseWish{
 		Ts: time.Now().AddDate(0, -2, 0),
 	}
 	r.False(wish.IsRecent)

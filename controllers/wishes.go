@@ -44,11 +44,17 @@ func GetUserWishes(ctx context.Context, request events.APIGatewayProxyRequest, d
 		{"$group": bson.M{
 			"_id": "$cat.name",
 			"wishes": bson.M{
-				"$push": bson.M{"name": "$name", "link": "$link", "preference": "$preference"},
+				"$push": bson.M{"name": "$name", "link": "$link", "preference": "$preference", "recent": "$recent"},
 			},
 		}},
 		{"$sort": bson.M{"_id": 1}},
 	})
+	// set is recent
+	for i := range wishes {
+		for j := range wishes[i].Wishes {
+			wishes[i].Wishes[j].SetRecent(3)
+		}
+	}
 	if err != nil {
 		logrus.Errorln(err)
 		return nil, fmt.Errorf("%d", http.StatusInternalServerError)

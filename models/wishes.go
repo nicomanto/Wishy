@@ -14,7 +14,8 @@ type BaseWish struct {
 	Name       string             `json:"name" bson:"name"`
 	Link       string             `json:"link" bson:"link"`
 	Preference PreferenceType     `json:"preference" bson:"preference"`
-	IsRecent   bool               `json:"recent" bson:"-"`
+	IsRecent   bool               `json:"recent" bson:"recent"`
+	Ts         time.Time          `json:"ts" bson:"ts"`
 }
 
 type Wish struct {
@@ -22,16 +23,15 @@ type Wish struct {
 	Category BaseCategory       `json:"cat" bson:"cat"`
 	UserId   primitive.ObjectID `json:"uid" bson:"uid"`
 	Active   bool               `json:"active" bson:"active"`
-	Ts       time.Time          `json:"ts" bson:"ts"`
 }
 
-func (w *Wish) SetRecent(month int) bool {
+func (w *BaseWish) SetRecent(month int) bool {
 	threeMonthsAgo := time.Now().AddDate(0, -month, 0)
 	w.IsRecent = w.Ts.After(threeMonthsAgo)
 	return w.IsRecent
 }
 
-func (c Wish) DBCollectionName() string {
+func (c BaseWish) DBCollectionName() string {
 	return "wishes"
 }
 

@@ -5,72 +5,28 @@ provider:
   runtime: provided.al2023
   region: ${env:AWS_REGION, 'eu-west-1'}
   stage: ${env:STAGE, 'dev'}
-
-  # ============================
-  # API GATEWAY CONFIGURATION
-  # ============================
   apiGateway:
-    # Allow binary responses (PDF download)
     binaryMediaTypes:
-      - "application/pdf"
-
-    # Global API throttling (first line of defense)
-    throttling:
-      rateLimit: 60        # max requests per second (overall)
-      burstLimit: 100      # allowed short traffic spikes
+      - "application/pdf" # Allow API Gateway to return PDFs as binary
+   
 
 functions:
   lambda:
     handler: bootstrap
-
-    # ============================
-    # LAMBDA COST PROTECTION
-    # ============================
-    timeout: 5            # prevent long-running executions
-    memorySize: 512       # increase only if strictly needed
-
+    # ----------------------------
+    # Lambda cost protection
+    # ----------------------------
+    timeout: 5        # hard stop for slow / abused requests
+    memorySize: 512   # keep costs predictable
     events:
-      # HTML page endpoint
+      #- http:
+      #   path: /categories
+      #    method: ANY
       - http:
           path: /wishes
           method: GET
-
-      # PDF generation endpoint (more expensive)
       - http:
           path: /wishes/pdf
           method: GET
 
-# ============================
-# PER-ENDPOINT THROTTLING
-# ============================
-resources:
-  Resources:
-    ApiGatewayStage:
-      Type: AWS::ApiGateway::Stage
-      Properties:
-        StageName: ${self:provider.stage}
-        RestApiId:
-          Ref: ApiGatewayRestApi
-        DeploymentId:
-          Ref: ApiGatewayDeployment
-        MethodSettings:
 
-          # ----------------------------
-          # HTML endpoint (/wishes)
-          # ----------------------------
-          - ResourcePath: "/wishes"
-            HttpMethod: "GET"
-            ThrottlingRateLimit: 40
-            ThrottlingBurstLimit: 60
-            MetricsEnabled: true
-            LoggingLevel: INFO
-
-          # ----------------------------
-          # PDF endpoint (/wishes/pdf)
-          # ----------------------------
-          - ResourcePath: "/wishes/pdf"
-            HttpMethod: "GET"
-            ThrottlingRateLimit: 10
-            ThrottlingBurstLimit: 20
-            MetricsEnabled: true
-            LoggingLevel: INFO

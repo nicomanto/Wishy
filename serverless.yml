@@ -9,7 +9,6 @@ provider:
     binaryMediaTypes:
       - "application/pdf" # Allow API Gateway to return PDFs as binary
    
-
 functions:
   lambda:
     handler: bootstrap

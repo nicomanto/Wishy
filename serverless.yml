@@ -16,8 +16,6 @@ functions:
     # ----------------------------
     # Lambda cost protection
     # ----------------------------
-    timeout: 5        # hard stop for slow / abused requests
-    memorySize: 512   # keep costs predictable
     events:
       #- http:
       #   path: /categories

@@ -154,9 +154,9 @@ func handleManagement(ctx context.Context, request events.APIGatewayProxyRequest
 			logrus.Errorln(err)
 			return renderManagerPage(controllers.ManagerPageData{Error: "An error occurred. Please try again later."}, http.StatusInternalServerError, nil)
 		}
-		return redirectManager(token)
+		return redirectManager(token, request)
 	case "logout":
-		return redirectManagerLogout()
+		return redirectManagerLogout(request)
 	}
 
 	user, err := managerUserFromRequest(ctx, request, db)
@@ -184,7 +184,7 @@ func handleManagement(ctx context.Context, request events.APIGatewayProxyRequest
 		}
 		return renderManagerPage(page, status, nil)
 	}
-	return redirectManager("")
+	return redirectManager("", request)
 }
 
 func managementForm(request events.APIGatewayProxyRequest) (url.Values, error) {
@@ -250,9 +250,23 @@ func renderManagerPage(page controllers.ManagerPageData, status int, headers map
 	return events.APIGatewayProxyResponse{StatusCode: status, Headers: headers, Body: body.String()}, nil
 }
 
-func redirectManager(token string) (events.APIGatewayProxyResponse, error) {
+func managerRedirectPath(request events.APIGatewayProxyRequest) string {
+	stage := request.RequestContext.Stage
+	if stage != "" && stage != "$default" && strings.Contains(request.RequestContext.DomainName, ".execute-api.") {
+		return "/" + stage + "/manage"
+	}
+	if strings.HasSuffix(request.RequestContext.Path, "/manage") {
+		return request.RequestContext.Path
+	}
+	if strings.HasSuffix(request.Path, "/manage") {
+		return request.Path
+	}
+	return "/manage"
+}
+
+func redirectManager(token string, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	headers := map[string]string{
-		"Location":      "manage",
+		"Location":      managerRedirectPath(request),
 		"Cache-Control": "no-store",
 	}
 	if token != "" {
@@ -261,11 +275,11 @@ func redirectManager(token string) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{StatusCode: http.StatusSeeOther, Headers: headers}, nil
 }
 
-func redirectManagerLogout() (events.APIGatewayProxyResponse, error) {
+func redirectManagerLogout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusSeeOther,
 		Headers: map[string]string{
-			"Location":      "manage",
+			"Location":      managerRedirectPath(request),
 			"Set-Cookie":    expiredManagerCookie(),
 			"Cache-Control": "no-store",
 		},

@@ -116,16 +116,34 @@ func TestRenderHtmlManagementPage(t *testing.T) {
 
 func TestManagerRedirectPreservesStagePath(t *testing.T) {
 	r := require.New(t)
-	response, err := redirectManager("session-token")
+	request := events.APIGatewayProxyRequest{
+		Path: "/manage",
+		RequestContext: events.APIGatewayProxyRequestContext{
+			Stage:      "prod",
+			DomainName: "abc123.execute-api.eu-west-1.amazonaws.com",
+			Path:       "/prod/manage",
+		},
+	}
+	response, err := redirectManager("session-token", request)
 	r.NoError(err)
 	r.Equal(303, response.StatusCode)
-	r.Equal("manage", response.Headers["Location"])
+	r.Equal("/prod/manage", response.Headers["Location"])
 	r.Contains(response.Headers["Set-Cookie"], "Path=/;")
 
-	logoutResponse, err := redirectManagerLogout()
+	logoutResponse, err := redirectManagerLogout(request)
 	r.NoError(err)
-	r.Equal("manage", logoutResponse.Headers["Location"])
+	r.Equal("/prod/manage", logoutResponse.Headers["Location"])
 	r.Contains(logoutResponse.Headers["Set-Cookie"], "Path=/;")
+
+	customDomainRequest := events.APIGatewayProxyRequest{
+		Path: "/manage",
+		RequestContext: events.APIGatewayProxyRequestContext{
+			Stage:      "prod",
+			DomainName: "wishy.example.com",
+			Path:       "/prod/manage",
+		},
+	}
+	r.Equal("/prod/manage", managerRedirectPath(customDomainRequest))
 }
 
 func TestGetUserWishesErrors(t *testing.T) {

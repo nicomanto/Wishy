@@ -14,6 +14,14 @@ This project create different aws lambda endpoints in order to manage a wish lis
 ## Deploy
 This project deploy over an AWS account (specified by credential stored in github secret variables) by a github action supported by Serverless framework
 
+## Request handling
+`main.go` connects to MongoDB and routes each API Gateway request to the controller for its endpoint:
+
+- `/manage` is handled by `controllers.HandleManagement`. The controller dispatches `GET` and `POST` requests, handles sign-in and sign-out, renders the management page, and routes form actions.
+- `/wishes` and `/wishes/pdf` are handled by the wishlist page controllers in `controllers/wishes.go`.
+
+Management form actions are dispatched internally to category and wish operations in `controllers/management.go`. Each operation validates its form values and scopes database changes to the signed-in user's ID. The HTML page is defined in `templates/html/management.tpl`.
+
 ## Wish management
 The `/manage` page lets a user sign in and manage their categories and wishes. The `users` collection must contain an `uname` and a generated `pw` for each account, in addition to the existing `_id` and `name` fields. The login form still labels these fields “Username” and “Password”. For example:
 
@@ -22,7 +30,7 @@ The `/manage` page lets a user sign in and manage their categories and wishes. T
   "_id": { "$oid": "..." },
   "name": "Display name",
   "uname": "manager",
-  "pw": "generated-password"
+  "pw": "<bcrypt hash>"
 }
 ```
 

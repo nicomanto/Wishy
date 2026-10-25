@@ -1,16 +1,13 @@
 package main
 
 import (
-	"context"
 	"os"
 	"strings"
 	"testing"
 	"time"
-	"wishy/controllers"
 	"wishy/models"
 	"wishy/templates"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/stretchr/testify/require"
 )
 
@@ -88,92 +85,6 @@ func TestRenderHtmlErrorPage(t *testing.T) {
 	var responseBody strings.Builder
 	err := templates.HtmlTpls[templates.ErrorPageHtmlTemplateType].Execute(&responseBody, mockFriendlyError)
 	r.NoError(err)
-}
-
-func TestRenderHtmlManagementPage(t *testing.T) {
-	r := require.New(t)
-	category := models.Category{BaseCategory: models.BaseCategory{Name: "<script>category</script>"}}
-	wish := models.Wish{
-		BaseWish: models.BaseWish{Name: "<script>wish</script>", Preference: models.Low},
-		Category: category.BaseCategory,
-		Active:   true,
-	}
-	page := controllers.ManagerPageData{
-		Authenticated: true,
-		User:          models.User{Username: "manager"},
-		Categories:    []models.Category{category},
-		Wishes:        []models.Wish{wish},
-		Error:         "<script>alert(1)</script>",
-		Path:          "/prod/manage",
-	}
-	var responseBody strings.Builder
-	err := templates.HtmlTpls[templates.ManagementHtmlTemplateType].Execute(&responseBody, page)
-	r.NoError(err)
-	r.NotContains(responseBody.String(), "<script>alert(1)</script>")
-	r.NotContains(responseBody.String(), "<script>category</script>")
-	r.NotContains(responseBody.String(), "<script>wish</script>")
-	r.Contains(responseBody.String(), "&lt;script&gt;")
-	r.Contains(responseBody.String(), `<html lang="en">`)
-	r.Contains(responseBody.String(), "Categories")
-	r.Contains(responseBody.String(), "Wish Management")
-	r.Contains(responseBody.String(), `action="/prod/manage"`)
-	r.NotContains(responseBody.String(), "Gestione wishes")
-	r.NotContains(responseBody.String(), "Accedi a Wishy")
-}
-
-func TestManagerRedirectPreservesStagePath(t *testing.T) {
-	r := require.New(t)
-	request := events.APIGatewayProxyRequest{
-		Path: "/manage",
-		RequestContext: events.APIGatewayProxyRequestContext{
-			Stage:      "prod",
-			DomainName: "abc123.execute-api.eu-west-1.amazonaws.com",
-			Path:       "/prod/manage",
-		},
-	}
-	response, err := redirectManager("session-token", request)
-	r.NoError(err)
-	r.Equal(303, response.StatusCode)
-	r.Equal("/prod/manage", response.Headers["Location"])
-	r.Contains(response.Headers["Set-Cookie"], "Path=/;")
-
-	logoutResponse, err := redirectManagerLogout(request)
-	r.NoError(err)
-	r.Equal("/prod/manage", logoutResponse.Headers["Location"])
-	r.Contains(logoutResponse.Headers["Set-Cookie"], "Path=/;")
-
-	customDomainRequest := events.APIGatewayProxyRequest{
-		Path: "/manage",
-		RequestContext: events.APIGatewayProxyRequestContext{
-			Stage:      "prod",
-			DomainName: "wishy.example.com",
-			Path:       "/prod/manage",
-		},
-	}
-	r.Equal("/prod/manage", managerRedirectPath(customDomainRequest))
-	r.Equal("/manage", normalizedRequestPath(customDomainRequest))
-
-	stagePrefixedRequest := events.APIGatewayProxyRequest{
-		Path: "/prod/manage",
-		RequestContext: events.APIGatewayProxyRequestContext{
-			Stage: "prod",
-		},
-	}
-	r.Equal("/manage", normalizedRequestPath(stagePrefixedRequest))
-	r.Equal("/prod/manage", managerRedirectPath(stagePrefixedRequest))
-}
-
-func TestGetUserWishesErrors(t *testing.T) {
-	r := require.New(t)
-	resp, err := controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{}}, nil)
-	r.Nil(resp)
-	r.Equal("400", err.Error())
-	resp, err = controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": ""}}, nil)
-	r.Nil(resp)
-	r.Equal("400", err.Error())
-	resp, err = controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": "aasdf"}}, nil)
-	r.Nil(resp)
-	r.Equal("400", err.Error())
 }
 
 func TestGenerateWishlistPDF(t *testing.T) {

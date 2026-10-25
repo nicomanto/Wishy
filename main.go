@@ -252,7 +252,7 @@ func renderManagerPage(page controllers.ManagerPageData, status int, headers map
 
 func redirectManager(token string) (events.APIGatewayProxyResponse, error) {
 	headers := map[string]string{
-		"Location":      "/manage",
+		"Location":      "manage",
 		"Cache-Control": "no-store",
 	}
 	if token != "" {
@@ -265,7 +265,7 @@ func redirectManagerLogout() (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusSeeOther,
 		Headers: map[string]string{
-			"Location":      "/manage",
+			"Location":      "manage",
 			"Set-Cookie":    expiredManagerCookie(),
 			"Cache-Control": "no-store",
 		},
@@ -273,11 +273,11 @@ func redirectManagerLogout() (events.APIGatewayProxyResponse, error) {
 }
 
 func managerCookie(token string) string {
-	return "wishy_manager=" + token + "; Path=/manage; Max-Age=" + strconv.Itoa(int(12*time.Hour.Seconds())) + "; HttpOnly; Secure; SameSite=Strict"
+	return "wishy_manager=" + token + "; Path=/; Max-Age=" + strconv.Itoa(int(12*time.Hour.Seconds())) + "; HttpOnly; Secure; SameSite=Strict"
 }
 
 func expiredManagerCookie() string {
-	return "wishy_manager=; Path=/manage; Max-Age=0; HttpOnly; Secure; SameSite=Strict"
+	return "wishy_manager=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict"
 }
 
 func main() {

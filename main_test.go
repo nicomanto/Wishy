@@ -114,6 +114,20 @@ func TestRenderHtmlManagementPage(t *testing.T) {
 	r.Contains(responseBody.String(), "&lt;script&gt;")
 }
 
+func TestManagerRedirectPreservesStagePath(t *testing.T) {
+	r := require.New(t)
+	response, err := redirectManager("session-token")
+	r.NoError(err)
+	r.Equal(303, response.StatusCode)
+	r.Equal("manage", response.Headers["Location"])
+	r.Contains(response.Headers["Set-Cookie"], "Path=/;")
+
+	logoutResponse, err := redirectManagerLogout()
+	r.NoError(err)
+	r.Equal("manage", logoutResponse.Headers["Location"])
+	r.Contains(logoutResponse.Headers["Set-Cookie"], "Path=/;")
+}
+
 func TestGetUserWishesErrors(t *testing.T) {
 	r := require.New(t)
 	resp, err := controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{}}, nil)

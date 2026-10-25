@@ -15,14 +15,14 @@ This project create different aws lambda endpoints in order to manage a wish lis
 This project deploy over an AWS account (specified by credential stored in github secret variables) by a github action supported by Serverless framework
 
 ## Wish management
-The `/manage` page lets a user sign in and manage their categories and wishes. The `users` collection must contain a `username` and a generated `password` for each account, in addition to the existing `_id` and `name` fields. For example:
+The `/manage` page lets a user sign in and manage their categories and wishes. The `users` collection must contain an `uname` and a generated `pw` for each account, in addition to the existing `_id` and `name` fields. The login form still labels these fields “Username” and “Password”. For example:
 
 ```json
 {
   "_id": { "$oid": "..." },
   "name": "Display name",
-  "username": "manager",
-  "password": "generated-password"
+  "uname": "manager",
+  "pw": "generated-password"
 }
 ```
 

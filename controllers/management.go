@@ -54,7 +54,7 @@ func managerError(status int, message string, err error) error {
 
 func LoginManager(ctx context.Context, username, password string, db *mongo.Database) (string, error) {
 	var user models.User
-	err := db.Collection(user.DBCollectionName()).FindOne(ctx, bson.M{"username": strings.TrimSpace(username)}).Decode(&user)
+	err := db.Collection(user.DBCollectionName()).FindOne(ctx, bson.M{"uname": strings.TrimSpace(username)}).Decode(&user)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return "", ErrInvalidCredentials

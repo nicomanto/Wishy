@@ -17,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const managerSessionDuration = 12 * time.Hour
@@ -61,11 +62,17 @@ func LoginManager(ctx context.Context, username, password string, db *mongo.Data
 		}
 		return "", managerError(500, "find manager account", err)
 	}
-	if password == "" || !hmac.Equal([]byte(user.Password), []byte(password)) {
+	if password == "" {
 		return "", ErrInvalidCredentials
 	}
+	if !verifyManagerPassword(user.Password, password) {
+		return "", ErrInvalidCredentials
+	}
+
 	now := time.Now()
-	result, err := db.Collection(user.DBCollectionName()).UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"last_login": now}})
+	filter := bson.M{"_id": user.ID}
+	updates := bson.M{"last_login": now}
+	result, err := db.Collection(user.DBCollectionName()).UpdateOne(ctx, filter, bson.M{"$set": updates})
 	if err != nil {
 		return "", managerError(500, "update last login", err)
 	}
@@ -73,6 +80,10 @@ func LoginManager(ctx context.Context, username, password string, db *mongo.Data
 		return "", managerError(401, "manager account no longer exists", nil)
 	}
 	return signManagerSession(user, time.Now().Add(managerSessionDuration)), nil
+}
+
+func verifyManagerPassword(storedPassword, password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(password)) == nil
 }
 
 func ManagerFromSession(ctx context.Context, token string, db *mongo.Database) (models.User, error) {

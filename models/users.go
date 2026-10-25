@@ -12,6 +12,7 @@ type User struct {
 	Username            string             `json:"username" bson:"uname"`
 	Password            string             `json:"-" bson:"pw"`
 	LastWishUpdate      time.Time          `json:"last_wish_update" bson:"last_wish_update"`
+	LastLogin           time.Time          `json:"last_login" bson:"last_login"`
 	IsRecentMonthConfig int                `json:"is_recent_month_config" bson:"is_recent_month_config"`
 }
 

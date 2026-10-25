@@ -26,4 +26,4 @@ The `/manage` page lets a user sign in and manage their categories and wishes. T
 }
 ```
 
-Passwords are compared against the value stored in MongoDB; the application does not create or reset accounts. Use generated passwords and serve the management page over HTTPS. The login cookie is HTTP-only, expires after 12 hours, and is signed using that user's stored password. Categories and wishes are scoped to the signed-in user's ID. A category cannot be deleted while wishes are still assigned to it.
+Passwords are compared against the value stored in MongoDB; the application does not create or reset accounts. Use generated passwords and serve the management page over HTTPS. The login cookie is HTTP-only, expires after 12 hours, and is signed using that user's stored password. A successful login updates `last_login`. Creating, updating, or deleting a wish updates `last_wish_update`. Categories and wishes are scoped to the signed-in user's ID. A category cannot be deleted while wishes are still assigned to it.

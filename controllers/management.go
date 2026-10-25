@@ -64,6 +64,14 @@ func LoginManager(ctx context.Context, username, password string, db *mongo.Data
 	if password == "" || !hmac.Equal([]byte(user.Password), []byte(password)) {
 		return "", ErrInvalidCredentials
 	}
+	now := time.Now()
+	result, err := db.Collection(user.DBCollectionName()).UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"last_login": now}})
+	if err != nil {
+		return "", managerError(500, "update last login", err)
+	}
+	if result.MatchedCount == 0 {
+		return "", managerError(401, "manager account no longer exists", nil)
+	}
 	return signManagerSession(user, time.Now().Add(managerSessionDuration)), nil
 }
 
@@ -125,7 +133,7 @@ func LoadManagerPage(ctx context.Context, user models.User, db *mongo.Database) 
 	if err := categoryCursor.All(ctx, &page.Categories); err != nil {
 		return page, managerError(500, "read categories", err)
 	}
-	wishCursor, err := db.Collection(models.Wish{}.DBCollectionName()).Find(ctx, bson.M{"uid": user.ID}, options.Find().SetSort(bson.D{{Key: "name", Value: 1}}))
+	wishCursor, err := db.Collection(models.Wish{}.DBCollectionName()).Find(ctx, bson.M{"uid": user.ID}, options.Find().SetSort(bson.D{{Key: "ts", Value: -1}, {Key: "name", Value: 1}}))
 	if err != nil {
 		return page, managerError(500, "load wishes", err)
 	}
@@ -163,9 +171,15 @@ func ManageData(ctx context.Context, action string, form url.Values, user models
 		if result.MatchedCount == 0 {
 			return managerError(404, "category not found", nil)
 		}
-		_, err = db.Collection(models.Wish{}.DBCollectionName()).UpdateMany(ctx, bson.M{"uid": user.ID, "cat._id": id}, bson.M{"$set": bson.M{"cat.name": name}})
+		now := time.Now()
+		wishResult, err := db.Collection(models.Wish{}.DBCollectionName()).UpdateMany(ctx, bson.M{"uid": user.ID, "cat._id": id}, bson.M{"$set": bson.M{"cat.name": name, "ts": now}})
 		if err != nil {
 			return managerError(500, "update category in wishes", err)
+		}
+		if wishResult.ModifiedCount > 0 {
+			if err := updateUserWishTimestamp(ctx, user, db); err != nil {
+				return err
+			}
 		}
 		return nil
 	case "category_delete":
@@ -211,8 +225,9 @@ func ManageData(ctx context.Context, action string, form url.Values, user models
 			return err
 		}
 		wish.Active = form.Get("active") == "on"
+		wish.Ts = time.Now()
 		result, err := db.Collection(wish.DBCollectionName()).UpdateOne(ctx, bson.M{"_id": id, "uid": user.ID}, bson.M{"$set": bson.M{
-			"name": wish.Name, "link": wish.Link, "preference": wish.Preference, "cat": wish.Category, "active": wish.Active,
+			"name": wish.Name, "link": wish.Link, "preference": wish.Preference, "cat": wish.Category, "active": wish.Active, "ts": wish.Ts,
 		}})
 		if err != nil {
 			return managerError(500, "update wish", err)
@@ -298,9 +313,12 @@ func objectIDField(value, field string) (primitive.ObjectID, error) {
 }
 
 func updateUserWishTimestamp(ctx context.Context, user models.User, db *mongo.Database) error {
-	_, err := db.Collection(user.DBCollectionName()).UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"last_wish_update": time.Now()}})
+	result, err := db.Collection(user.DBCollectionName()).UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"last_wish_update": time.Now()}})
 	if err != nil {
 		return managerError(500, "update wishlist timestamp", err)
+	}
+	if result.MatchedCount == 0 {
+		return managerError(404, "user not found while updating wishlist timestamp", nil)
 	}
 	return nil
 }

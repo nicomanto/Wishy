@@ -104,6 +104,7 @@ func TestRenderHtmlManagementPage(t *testing.T) {
 		Categories:    []models.Category{category},
 		Wishes:        []models.Wish{wish},
 		Error:         "<script>alert(1)</script>",
+		Path:          "/prod/manage",
 	}
 	var responseBody strings.Builder
 	err := templates.HtmlTpls[templates.ManagementHtmlTemplateType].Execute(&responseBody, page)
@@ -112,6 +113,12 @@ func TestRenderHtmlManagementPage(t *testing.T) {
 	r.NotContains(responseBody.String(), "<script>category</script>")
 	r.NotContains(responseBody.String(), "<script>wish</script>")
 	r.Contains(responseBody.String(), "&lt;script&gt;")
+	r.Contains(responseBody.String(), `<html lang="en">`)
+	r.Contains(responseBody.String(), "Categories")
+	r.Contains(responseBody.String(), "Wish Management")
+	r.Contains(responseBody.String(), `action="/prod/manage"`)
+	r.NotContains(responseBody.String(), "Gestione wishes")
+	r.NotContains(responseBody.String(), "Accedi a Wishy")
 }
 
 func TestManagerRedirectPreservesStagePath(t *testing.T) {

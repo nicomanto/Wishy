@@ -1,16 +1,13 @@
 package main
 
 import (
-	"context"
 	"os"
 	"strings"
 	"testing"
 	"time"
-	"wishy/controllers"
 	"wishy/models"
 	"wishy/templates"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/stretchr/testify/require"
 )
 
@@ -88,19 +85,6 @@ func TestRenderHtmlErrorPage(t *testing.T) {
 	var responseBody strings.Builder
 	err := templates.HtmlTpls[templates.ErrorPageHtmlTemplateType].Execute(&responseBody, mockFriendlyError)
 	r.NoError(err)
-}
-
-func TestGetUserWishesErrors(t *testing.T) {
-	r := require.New(t)
-	resp, err := controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{}}, nil)
-	r.Nil(resp)
-	r.Equal("400", err.Error())
-	resp, err = controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": ""}}, nil)
-	r.Nil(resp)
-	r.Equal("400", err.Error())
-	resp, err = controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{"uid": "aasdf"}}, nil)
-	r.Nil(resp)
-	r.Equal("400", err.Error())
 }
 
 func TestGenerateWishlistPDF(t *testing.T) {

@@ -27,5 +27,10 @@ functions:
       - http:
           path: /wishes/pdf
           method: GET
-
+      - http:
+          path: /manage
+          method: GET
+      - http:
+          path: /manage
+          method: POST
 

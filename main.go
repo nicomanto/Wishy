@@ -39,7 +39,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	// pre load html page
 	templates.InitHtmlTpls()
 
-	endpoint := Endpoint(request.Path)
+	endpoint := Endpoint(normalizedRequestPath(request))
 	// Execute different logic based on the endpoint
 	switch endpoint {
 	case ManageEndpoint:
@@ -123,17 +123,17 @@ func handleManagement(ctx context.Context, request events.APIGatewayProxyRequest
 		if err != nil {
 			if managerStatus(err) != http.StatusUnauthorized {
 				logrus.Errorln(err)
-				return renderManagerPage(controllers.ManagerPageData{Error: "An error occurred. Please try again later."}, http.StatusInternalServerError, nil)
+				return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "An error occurred. Please try again later."}, http.StatusInternalServerError, nil)
 			}
 			headers := map[string]string{"Set-Cookie": expiredManagerCookie()}
-			return renderManagerPage(controllers.ManagerPageData{}, http.StatusOK, headers)
+			return renderManagerPageForRequest(request, controllers.ManagerPageData{}, http.StatusOK, headers)
 		}
 		page, err := controllers.LoadManagerPage(ctx, user, db)
 		if err != nil {
 			logrus.Errorln(err)
-			return renderManagerPage(controllers.ManagerPageData{Error: "Unable to load data."}, http.StatusInternalServerError, nil)
+			return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "Unable to load data."}, http.StatusInternalServerError, nil)
 		}
-		return renderManagerPage(page, http.StatusOK, nil)
+		return renderManagerPageForRequest(request, page, http.StatusOK, nil)
 	}
 	if request.HTTPMethod != http.MethodPost {
 		return events.APIGatewayProxyResponse{StatusCode: http.StatusMethodNotAllowed, Headers: map[string]string{"Allow": "GET, POST"}}, nil
@@ -141,7 +141,7 @@ func handleManagement(ctx context.Context, request events.APIGatewayProxyRequest
 
 	form, err := managementForm(request)
 	if err != nil {
-		return renderManagerPage(controllers.ManagerPageData{Error: "Invalid request."}, http.StatusBadRequest, nil)
+		return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "Invalid request."}, http.StatusBadRequest, nil)
 	}
 	action := form.Get("action")
 	switch action {
@@ -149,10 +149,10 @@ func handleManagement(ctx context.Context, request events.APIGatewayProxyRequest
 		token, err := controllers.LoginManager(ctx, form.Get("username"), form.Get("password"), db)
 		if err != nil {
 			if errors.Is(err, controllers.ErrInvalidCredentials) {
-				return renderManagerPage(controllers.ManagerPageData{Error: "Incorrect username or password."}, http.StatusUnauthorized, nil)
+				return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "Incorrect username or password."}, http.StatusUnauthorized, nil)
 			}
 			logrus.Errorln(err)
-			return renderManagerPage(controllers.ManagerPageData{Error: "An error occurred. Please try again later."}, http.StatusInternalServerError, nil)
+			return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "An error occurred. Please try again later."}, http.StatusInternalServerError, nil)
 		}
 		return redirectManager(token, request)
 	case "logout":
@@ -163,9 +163,9 @@ func handleManagement(ctx context.Context, request events.APIGatewayProxyRequest
 	if err != nil {
 		if managerStatus(err) != http.StatusUnauthorized {
 			logrus.Errorln(err)
-			return renderManagerPage(controllers.ManagerPageData{Error: "An error occurred. Please try again later."}, http.StatusInternalServerError, nil)
+			return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "An error occurred. Please try again later."}, http.StatusInternalServerError, nil)
 		}
-		return renderManagerPage(controllers.ManagerPageData{Error: "Please sign in again."}, http.StatusUnauthorized, map[string]string{"Set-Cookie": expiredManagerCookie()})
+		return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "Please sign in again."}, http.StatusUnauthorized, map[string]string{"Set-Cookie": expiredManagerCookie()})
 	}
 	if err := controllers.ManageData(ctx, action, form, user, db); err != nil {
 		status := managerStatus(err)
@@ -175,14 +175,14 @@ func handleManagement(ctx context.Context, request events.APIGatewayProxyRequest
 		page, loadErr := controllers.LoadManagerPage(ctx, user, db)
 		if loadErr != nil {
 			logrus.Errorln(loadErr)
-			return renderManagerPage(controllers.ManagerPageData{Error: "Unable to load data."}, http.StatusInternalServerError, nil)
+			return renderManagerPageForRequest(request, controllers.ManagerPageData{Error: "Unable to load data."}, http.StatusInternalServerError, nil)
 		}
 		if status >= http.StatusInternalServerError {
 			page.Error = "An error occurred. Please try again later."
 		} else {
 			page.Error = err.Error()
 		}
-		return renderManagerPage(page, status, nil)
+		return renderManagerPageForRequest(request, page, status, nil)
 	}
 	return redirectManager("", request)
 }
@@ -251,17 +251,36 @@ func renderManagerPage(page controllers.ManagerPageData, status int, headers map
 }
 
 func managerRedirectPath(request events.APIGatewayProxyRequest) string {
+	return managementPath(request)
+}
+
+func managementPath(request events.APIGatewayProxyRequest) string {
 	stage := request.RequestContext.Stage
-	if stage != "" && stage != "$default" && strings.Contains(request.RequestContext.DomainName, ".execute-api.") {
-		return "/" + stage + "/manage"
+	if stage == "" || stage == "$default" {
+		if strings.HasSuffix(request.Path, "/manage") {
+			return request.Path
+		}
+		return "/manage"
 	}
-	if strings.HasSuffix(request.RequestContext.Path, "/manage") {
-		return request.RequestContext.Path
-	}
-	if strings.HasSuffix(request.Path, "/manage") {
+	prefix := "/" + stage
+	if strings.HasPrefix(request.Path, prefix+"/") {
 		return request.Path
 	}
-	return "/manage"
+	return prefix + "/manage"
+}
+
+func normalizedRequestPath(request events.APIGatewayProxyRequest) string {
+	path := request.Path
+	stage := request.RequestContext.Stage
+	if stage != "" && stage != "$default" && strings.HasPrefix(path, "/"+stage+"/") {
+		path = strings.TrimPrefix(path, "/"+stage)
+	}
+	return path
+}
+
+func renderManagerPageForRequest(request events.APIGatewayProxyRequest, page controllers.ManagerPageData, status int, headers map[string]string) (events.APIGatewayProxyResponse, error) {
+	page.Path = managementPath(request)
+	return renderManagerPage(page, status, headers)
 }
 
 func redirectManager(token string, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

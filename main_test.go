@@ -144,6 +144,16 @@ func TestManagerRedirectPreservesStagePath(t *testing.T) {
 		},
 	}
 	r.Equal("/prod/manage", managerRedirectPath(customDomainRequest))
+	r.Equal("/manage", normalizedRequestPath(customDomainRequest))
+
+	stagePrefixedRequest := events.APIGatewayProxyRequest{
+		Path: "/prod/manage",
+		RequestContext: events.APIGatewayProxyRequestContext{
+			Stage: "prod",
+		},
+	}
+	r.Equal("/manage", normalizedRequestPath(stagePrefixedRequest))
+	r.Equal("/prod/manage", managerRedirectPath(stagePrefixedRequest))
 }
 
 func TestGetUserWishesErrors(t *testing.T) {

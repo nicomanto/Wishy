@@ -33,7 +33,7 @@
     {{if .Authenticated}}
     <h1>Gestione wishes</h1>
     <p class="muted">Accesso effettuato come {{.User.Username}}.</p>
-    <form class="inline" method="post" action="/manage">
+    <form class="inline" method="post" action="{{.Path}}">
         <input type="hidden" name="action" value="logout">
         <button type="submit">Esci</button>
     </form>
@@ -41,7 +41,7 @@
 
     <section>
         <h2>Categorie</h2>
-        <form method="post" action="/manage">
+        <form method="post" action="{{$.Path}}">
             <input type="hidden" name="action" value="category_create">
             <label for="new-category">Nuova categoria</label>
             <input id="new-category" name="name" required maxlength="100">
@@ -49,13 +49,13 @@
         </form>
         {{range .Categories}}
         <div class="item">
-            <form class="grid" method="post" action="/manage">
+            <form class="grid" method="post" action="{{$.Path}}">
                 <input type="hidden" name="action" value="category_update">
                 <input type="hidden" name="category_id" value="{{.ID.Hex}}">
                 <label>Nome categoria<input name="name" value="{{.Name}}" required maxlength="100"></label>
                 <button type="submit">Salva</button>
             </form>
-            <form method="post" action="/manage">
+            <form method="post" action="{{$.Path}}">
                 <input type="hidden" name="action" value="category_delete">
                 <input type="hidden" name="category_id" value="{{.ID.Hex}}">
                 <button class="danger" type="submit">Elimina categoria</button>
@@ -66,7 +66,7 @@
 
     <section>
         <h2>Wishes</h2>
-        <form method="post" action="/manage">
+        <form method="post" action="{{$.Path}}">
             <input type="hidden" name="action" value="wish_create">
             <div class="grid">
                 <label>Nome<input name="name" required maxlength="200"></label>
@@ -88,7 +88,7 @@
         {{range .Wishes}}
         {{$wish := .}}
         <div class="item">
-            <form method="post" action="/manage">
+            <form method="post" action="{{$.Path}}">
                 <input type="hidden" name="action" value="wish_update">
                 <input type="hidden" name="wish_id" value="{{.ID.Hex}}">
                 <div class="grid">
@@ -110,7 +110,7 @@
                 <label><input type="checkbox" name="active" {{if .Active}}checked{{end}}> Wish attivo</label>
                 <button type="submit">Salva wish</button>
             </form>
-            <form method="post" action="/manage">
+            <form method="post" action="{{$.Path}}">
                 <input type="hidden" name="action" value="wish_delete">
                 <input type="hidden" name="wish_id" value="{{.ID.Hex}}">
                 <button class="danger" type="submit">Elimina wish</button>
@@ -122,7 +122,7 @@
     <section>
         <h1>Accedi a Wishy</h1>
         {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
-        <form method="post" action="/manage">
+        <form method="post" action="{{.Path}}">
             <input type="hidden" name="action" value="login">
             <label for="username">Username</label>
             <input id="username" name="username" autocomplete="username" required>

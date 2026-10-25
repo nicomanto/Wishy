@@ -29,6 +29,7 @@ type ManagerPageData struct {
 	Categories    []models.Category
 	Wishes        []models.Wish
 	Error         string
+	Path          string
 }
 
 type ManagerError struct {

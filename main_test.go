@@ -90,6 +90,30 @@ func TestRenderHtmlErrorPage(t *testing.T) {
 	r.NoError(err)
 }
 
+func TestRenderHtmlManagementPage(t *testing.T) {
+	r := require.New(t)
+	category := models.Category{BaseCategory: models.BaseCategory{Name: "<script>category</script>"}}
+	wish := models.Wish{
+		BaseWish: models.BaseWish{Name: "<script>wish</script>", Preference: models.Low},
+		Category: category.BaseCategory,
+		Active:   true,
+	}
+	page := controllers.ManagerPageData{
+		Authenticated: true,
+		User:          models.User{Username: "manager"},
+		Categories:    []models.Category{category},
+		Wishes:        []models.Wish{wish},
+		Error:         "<script>alert(1)</script>",
+	}
+	var responseBody strings.Builder
+	err := templates.HtmlTpls[templates.ManagementHtmlTemplateType].Execute(&responseBody, page)
+	r.NoError(err)
+	r.NotContains(responseBody.String(), "<script>alert(1)</script>")
+	r.NotContains(responseBody.String(), "<script>category</script>")
+	r.NotContains(responseBody.String(), "<script>wish</script>")
+	r.Contains(responseBody.String(), "&lt;script&gt;")
+}
+
 func TestGetUserWishesErrors(t *testing.T) {
 	r := require.New(t)
 	resp, err := controllers.GetUserWishes(context.Background(), events.APIGatewayProxyRequest{QueryStringParameters: map[string]string{}}, nil)

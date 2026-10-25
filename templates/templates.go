@@ -1,15 +1,16 @@
 package templates
 
 import (
+	"html/template"
 	"sync"
-	"text/template"
 )
 
 type HtmlTemplateType string
 
 const (
-	WishListHtmlTemplateType  HtmlTemplateType = "wishlist"
-	ErrorPageHtmlTemplateType HtmlTemplateType = "errorpage"
+	WishListHtmlTemplateType   HtmlTemplateType = "wishlist"
+	ErrorPageHtmlTemplateType  HtmlTemplateType = "errorpage"
+	ManagementHtmlTemplateType HtmlTemplateType = "management"
 )
 
 var once sync.Once
@@ -39,6 +40,11 @@ func loadHtmlTpls() (map[HtmlTemplateType]*template.Template, error) {
 		return nil, e
 	} else {
 		tpls[ErrorPageHtmlTemplateType] = t
+	}
+	if t, e := template.New("management.tpl").ParseFiles("./templates/html/management.tpl"); e != nil {
+		return nil, e
+	} else {
+		tpls[ManagementHtmlTemplateType] = t
 	}
 	return tpls, nil
 }
